@@ -1,0 +1,250 @@
+/* Bilty Page - Professional Light Theme */
+
+/* Hide everything on print except iframe-based content */
+@media print {
+  .no-print { display: none !important; }
+}
+
+/* Bilty Number Header Badge */
+.bilty-number-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-md);
+  animation: fadeIn var(--transition-normal);
+}
+.bilty-number-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.bilty-number-value {
+  font-size: 2.75rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  font-family: 'Inter', monospace;
+}
+.bilty-number-date {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-top: 0.25rem;
+}
+.bilty-status-badge {
+  background: rgba(255,255,255,0.15);
+  padding: 0.5rem 1.5rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Print layout */
+.bilty-print-area {
+  background: white;
+  color: black;
+  font-family: 'Times New Roman', serif;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Company Header */
+.print-company-header {
+  background: #1e3a8a;
+  color: white;
+  text-align: center;
+  padding: 1.5rem;
+  border-bottom: 4px solid var(--warning);
+  position: relative;
+}
+.print-company-logo-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.print-company-truck-icon {
+  font-size: 2.5rem;
+}
+.print-company-name {
+  font-size: 1.75rem;
+  font-weight: 900;
+  font-family: 'Arial Black', sans-serif;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.print-company-tagline {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+.print-company-contact-bar {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  background: rgba(0,0,0,0.1);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+/* Bilty number strip */
+.print-bilty-strip {
+  background: var(--warning);
+  color: #1e3a8a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 900;
+  font-size: 1rem;
+}
+.print-bilty-no-big {
+  font-size: 1.5rem;
+}
+
+/* Info Grid */
+.print-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 2px solid #1e3a8a;
+}
+.print-info-col {
+  padding: 1rem 1.5rem;
+  border-right: 2px solid #1e3a8a;
+}
+.print-info-col:last-child { border-right: none; }
+.print-info-col-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: white;
+  background: #1e3a8a;
+  padding: 0.25rem 0.75rem;
+  display: inline-block;
+  border-radius: 3px;
+  margin-bottom: 0.75rem;
+}
+.print-info-row {
+  display: flex;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  gap: 0.5rem;
+}
+.print-info-key {
+  font-weight: 700;
+  min-width: 100px;
+  color: #1e3a8a;
+}
+.print-info-val {
+  color: #000;
+  font-weight: 500;
+}
+
+/* Goods Table */
+.print-goods-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.print-goods-table th {
+  background: #1e3a8a;
+  color: white;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+.print-goods-table td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: #000;
+}
+.print-goods-table tr:nth-child(even) td {
+  background: #f8fafc;
+}
+.print-totals-row td {
+  font-weight: 800;
+  background: #eff6ff !important;
+  border-top: 2px solid #1e3a8a;
+  color: #1e3a8a;
+}
+
+/* Payment Section */
+.print-payment-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 2px solid #1e3a8a;
+  border-bottom: 2px solid #1e3a8a;
+}
+.print-payment-block {
+  padding: 1rem 1.5rem;
+  border-right: 2px solid #1e3a8a;
+}
+.print-payment-block:last-child { border-right: none; }
+.print-payment-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+}
+.print-payment-value {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1e3a8a;
+}
+.print-payment-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--warning);
+  color: #1e3a8a;
+}
+
+/* Footer */
+.print-footer {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.5rem;
+  border-bottom: 2px solid #1e3a8a;
+}
+.print-sign-box {
+  text-align: center;
+}
+.print-sign-line {
+  border-top: 1px solid #94a3b8;
+  margin-top: 2.5rem;
+  padding-top: 0.5rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.print-terms {
+  background: var(--surface);
+  padding: 1rem 1.5rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+.print-terms-title {
+  font-weight: 700;
+  color: #1e3a8a;
+  display: inline;
+}
