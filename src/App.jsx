@@ -15,6 +15,8 @@ import PartyLedger from './pages/PartyLedger';
 import BiltyHistory from './pages/BiltyHistory';
 import LahoreCashLedger from './pages/LahoreCashLedger';
 import BrokerRecord from './pages/BrokerRecord';
+import VehicleManagement from './pages/VehicleManagement';
+import VehicleDetail from './pages/VehicleDetail';
 import Login from './pages/Login';
 
 const ProtectedRoute = ({ children, isAuthenticated }) => {
@@ -52,6 +54,8 @@ function App() {
           <Route path="bilty-history" element={<BiltyHistory />} />
           <Route path="ledger/lahore" element={<LahoreCashLedger />} />
           <Route path="broker-record" element={<BrokerRecord />} />
+          <Route path="vehicles" element={<VehicleManagement />} />
+          <Route path="vehicles/:id" element={<VehicleDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

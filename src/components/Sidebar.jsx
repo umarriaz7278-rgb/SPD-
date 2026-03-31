@@ -59,6 +59,11 @@ const Sidebar = () => {
           <History size={17} /> Bilty History
         </NavLink>
 
+        <div className="nav-section">Fleet Management</div>
+        <NavLink to="/vehicles" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
+          <Truck size={17} /> Vehicle Settings
+        </NavLink>
+
         <div className="nav-section">Accounts</div>
         <NavLink to="/ledger/cash" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
           <Wallet size={17} /> Cash Ledger Karachi
