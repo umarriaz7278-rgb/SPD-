@@ -34,8 +34,8 @@ const ChalanManagement = () => {
 
   // Print state
   const [showPrintPreview, setShowPrintPreview] = useState(false);
-  const [savedChalan, setSavedChalan] = useState(null);
-  const [savedBilties, setSavedBilties] = useState([]);
+  const [printChalanData, setPrintChalanData] = useState(null);
+  const [printBiltiesData, setPrintBiltiesData] = useState([]);
 
 
   useEffect(() => {
