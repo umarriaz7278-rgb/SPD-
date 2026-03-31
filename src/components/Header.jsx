@@ -1,7 +1,15 @@
 import React from 'react';
-import { Search, Bell, User } from 'lucide-react';
+import { Search, Bell, User, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('spd_auth');
+    window.location.reload(); // Hard refresh to clear state
+  };
+
   return (
     <header className="header">
       <div className="header-company-info">
@@ -25,6 +33,21 @@ const Header = () => {
         </button>
         <button className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '50%', border: 'none', backgroundColor: 'var(--primary-light)' }}>
           <User size={18} style={{ color: 'var(--primary)' }} />
+        </button>
+        <button 
+          onClick={handleLogout}
+          className="btn btn-outline" 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.4rem', 
+            fontSize: '0.8rem', 
+            fontWeight: 700, 
+            color: '#ef4444',
+            borderColor: '#fee2e2'
+          }}
+        >
+          <LogOut size={16} /> Logout
         </button>
       </div>
     </header>

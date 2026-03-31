@@ -145,8 +145,17 @@ const BrokerRecord = () => {
       <head>
         <title>Broker Statement - ${selectedBroker.name}</title>
         <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Arial', sans-serif; background: white; color: black; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .broker-print-area { display: block !important; visibility: visible !important; width: 100%; padding: 20px; }
           @page { size: A4; margin: 10mm; }
-          body { margin: 0; padding: 0; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th { background: #1e3a8a !important; color: white !important; padding: 8px; text-align: left; }
+          td { padding: 8px; border-bottom: 1px solid #ddd; }
+          .text-right { text-align: right; }
+          .font-bold { font-weight: bold; }
+          .text-success { color: #16a34a !important; }
+          .text-danger { color: #dc2626 !important; }
         </style>
       </head>
       <body>

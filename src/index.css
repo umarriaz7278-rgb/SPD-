@@ -225,6 +225,11 @@ tr:hover td {
   background-color: var(--primary-light);
 }
 
+/* Compact Utilities */
+.p-compact { padding: 0.75rem !important; }
+.mb-compact { margin-bottom: 0.75rem !important; }
+.text-2xs { font-size: 0.7rem; line-height: 1rem; }
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
@@ -248,5 +253,49 @@ tr:hover td {
 .gap-6 { gap: 1.5rem; }
 .grid { display: grid; }
 .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Print Styles */
+@media print {
+  /* Hide non-essential layout pieces */
+  .no-print,
+  .sidebar,
+  .layout-header,
+  .history-filter-select,
+  .history-date-input,
+  .search-icon,
+  input[type="text"],
+  input[type="date"],
+  select,
+  button {
+    display: none !important;
+  }
+
+  /* Force background colors and text for printing */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background-color: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .page-container {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Let print areas take full width */
+  .bilty-print-area, .chalan-print-area {
+    display: block !important;
+    width: 100% !important;
+    page-break-after: always;
+  }
+}
+.grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
+.grid-cols-6 { grid-template-columns: repeat(6, 1fr); }
+.grid-cols-7 { grid-template-columns: repeat(7, 1fr); }

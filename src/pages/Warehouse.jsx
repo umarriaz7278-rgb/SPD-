@@ -178,9 +178,8 @@ const Warehouse = () => {
       
       setSavedBilty(bilty);
       setSavedItems(data || []);
-      // Removed setShowPrintPreview(true) to simplify
-
-      setTimeout(() => handlePrint(), 500);
+      
+      setTimeout(() => window.print(), 500);
 
     } catch (error) {
       console.error('Error fetching bilty items:', error);
@@ -188,74 +187,6 @@ const Warehouse = () => {
     } finally {
       setFetchingItems(false);
     }
-  };
-
-  const handlePrint = () => {
-    const printContent = document.getElementById('bilty-print-target');
-    if (!printContent) return;
-
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`
-      <html>
-      <head>
-        <title>Bilty Print</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: 'Arial', sans-serif; background: white; color: black; }
-          .bilty-print-area { width: 100%; max-width: 800px; margin: 0 auto; }
-          .print-company-header { background: #1e3a8a; color: white; text-align: center; padding: 1.5rem 2rem; border-bottom: 5px solid #f59e0b; border-radius: 8px 8px 0 0; }
-          .print-company-name { font-size: 1.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-          .print-company-tagline { font-size: 0.85rem; opacity: 0.9; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 0.2rem; margin-bottom: 0.8rem; }
-          .print-company-contact-bar { background: rgba(255,255,255,0.1); padding: 0.6rem; border-radius: 6px; font-size: 0.8rem; line-height: 1.4; }
-          .print-bilty-strip { background: #f59e0b; color: #1e3a8a; display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1.5rem; font-weight: 900; font-size: 0.95rem; }
-          .print-bilty-no-big { font-size: 1.4rem; letter-spacing: 0.05em; }
-          .print-info-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 2px solid #1e3a8a; border-bottom: 2px solid #1e3a8a; }
-          .print-info-col { padding: 0.75rem 1.25rem; border-right: 2px solid #1e3a8a; }
-          .print-info-col:last-child { border-right: none; }
-          .print-info-col-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: white; background: #1e3a8a; padding: 0.2rem 0.5rem; display: inline-block; border-radius: 3px; margin-bottom: 0.5rem; letter-spacing: 0.05em; }
-          .print-info-row { display: flex; margin-bottom: 0.2rem; font-size: 0.82rem; gap: 0.25rem; }
-          .print-info-key { font-weight: 700; min-width: 90px; flex-shrink: 0; color: #1e3a8a; }
-          .print-info-val { color: #111; font-weight: 500; }
-          .print-goods-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-          .print-goods-table th { background: #1e3a8a; color: white; padding: 0.5rem 0.75rem; text-align: left; font-size: 0.75rem; text-transform: uppercase; }
-          .print-goods-table td { padding: 0.45rem 0.75rem; border-bottom: 1px solid #e5e7eb; color: #111; }
-          .print-goods-table tr:nth-child(even) td { background: #f8faff; }
-          .print-totals-row td { font-weight: 700; background: #eff6ff !important; border-top: 2px solid #1e3a8a; color: #1e3a8a; }
-          .print-payment-section { display: grid; grid-template-columns: 1fr 1fr; border-top: 2px solid #1e3a8a; border-bottom: 2px solid #1e3a8a; }
-          .print-payment-block { padding: 0.75rem 1.25rem; border-right: 2px solid #1e3a8a; }
-          .print-payment-block:last-child { border-right: none; }
-          .print-payment-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #1e3a8a; margin-bottom: 0.35rem; }
-          .print-payment-value { font-size: 1.3rem; font-weight: 900; color: #1e3a8a; }
-          .print-payment-badge { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; background: #f59e0b; color: #1e3a8a; }
-          .print-footer { padding: 0.75rem 1.25rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; border-bottom: 2px solid #1e3a8a; }
-          .print-sign-box { text-align: center; }
-          .print-sign-line { border-top: 1px solid #aaa; margin-top: 2rem; padding-top: 0.25rem; font-size: 0.7rem; text-transform: uppercase; color: #555; font-weight: 600; }
-          .print-terms { background: #eff6ff; padding: 0.5rem 1.25rem; font-size: 0.65rem; color: #555; border-top: 1px solid #bfdbfe; }
-          .print-terms-title { font-weight: 700; color: #1e3a8a; }
-        </style>
-      </head>
-      <body>
-        ${printContent.outerHTML}
-      </body>
-      </html>
-    `);
-    doc.close();
-
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-
-    // Cleanup after print
-    setTimeout(() => document.body.removeChild(iframe), 1000);
   };
 
   useEffect(() => {
@@ -268,6 +199,7 @@ const Warehouse = () => {
       const { data, error } = await supabase
         .from('bilties')
         .select('*')
+        .eq('status', 'Warehouse')
         .gt('remaining_quantity', 0)
         .order('created_at', { ascending: false });
 
@@ -293,7 +225,7 @@ const Warehouse = () => {
 
       {/* Hidden print target */}
       {savedBilty && (
-        <div style={{ display: 'none' }} id="bilty-print-target">
+        <div className="print-only" style={{ display: 'none' }} id="bilty-print-target">
            <PrintBilty bilty={savedBilty} items={savedItems} />
         </div>
       )}

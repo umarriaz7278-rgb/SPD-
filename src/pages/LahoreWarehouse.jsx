@@ -6,6 +6,7 @@ const LahoreWarehouse = () => {
   const [bilties, setBilties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [missingColumn, setMissingColumn] = useState(false);
 
   // Delivery Modal State
   const [showDeliveryModal, setShowDeliveryModal] = useState(false);
@@ -29,10 +30,23 @@ const LahoreWarehouse = () => {
         .from('bilties')
         .select('*')
         .eq('status', 'Lahore Warehouse')
-        .gt('lahore_quantity', 0)
-        .order('created_at', { ascending: false });
+      if (error) {
+        if (error.code === '42703') {
+            setMissingColumn(true);
+            const retryRes = await supabase
+                .from('bilties')
+                .select('*')
+                .eq('status', 'Lahore Warehouse')
+                .order('created_at', { ascending: false });
+            setBilties(retryRes.data || []);
+            return;
+        }
+        throw error;
+      }
 
-      if (error) throw error;
+      if (data && data.length > 0 && !('lahore_quantity' in data[0])) {
+          setMissingColumn(true);
+      }
       setBilties(data || []);
     } catch (error) {
       console.error('Error fetching Lahore bilties:', error);
@@ -122,6 +136,33 @@ const LahoreWarehouse = () => {
         </div>
       </div>
 
+      {missingColumn && (
+        <div className="card mb-6" style={{ background: '#fff7ed', border: '1px solid #ffedd5', color: '#9a3412' }}>
+          <div className="flex items-start gap-4">
+            <div style={{ fontSize: '2rem' }}>⚠️</div>
+            <div>
+              <h3 className="font-bold text-lg mb-1">Database Update Required</h3>
+              <p className="mb-3">The "Lahore Quantity" feature is enabled in the code but missing from your database. To see quantities here, please run this SQL in your Supabase SQL Editor:</p>
+              <pre style={{ background: '#fed7aa', padding: '1rem', borderRadius: '8px', fontSize: '0.8rem', overflowX: 'auto', fontWeight: 'bold', border: '1px solid #fdba74' }}>
+                ALTER TABLE bilties ADD COLUMN IF NOT EXISTS lahore_quantity NUMERIC DEFAULT 0;
+              </pre>
+              <div className="mt-4 flex gap-3">
+                <a 
+                  href="https://app.supabase.com/project/_/sql" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="btn btn-primary text-xs"
+                  style={{ background: '#9a3412', border: 'none', padding: '0.5rem 1rem' }}
+                >
+                   Open Supabase SQL Editor
+                </a>
+                <p className="text-xs self-center">1. Copy code above. 2. Click button. 3. Paste and Run.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="card mb-6">
         <div className="flex gap-4 mb-4">
           <div className="relative" style={{ position: 'relative', flex: 1 }}>
@@ -168,7 +209,15 @@ const LahoreWarehouse = () => {
                       <div>{bilty.receiver_name}</div>
                       <div className="text-xs text-muted">{bilty.receiver_phone}</div>
                     </td>
-                    <td className="font-bold text-primary text-xl">{bilty.lahore_quantity}</td>
+                    <td className="font-bold text-primary text-xl">
+                      {missingColumn ? (
+                        <span className="text-xs text-danger-foreground bg-danger-light px-2 py-1 rounded" style={{ backgroundColor: 'var(--danger-light)', color: 'var(--danger)' }}>
+                           Needs DB Setup
+                        </span>
+                      ) : (
+                        bilty.lahore_quantity
+                      )}
+                    </td>
                     <td>
                       <span style={{ 
                         padding: '0.25rem 0.5rem', 

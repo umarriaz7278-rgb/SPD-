@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Map, Truck, Navigation, Settings, Eye, Printer, Loader2 } from 'lucide-react';
+import { Map, Truck, Navigation, Settings, Eye, Printer, Loader2, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import PrintChalan from '../components/PrintChalan';
 
@@ -48,6 +48,12 @@ const TransitTracking = () => {
         .eq('id', id);
 
       if (error) throw error;
+
+      // Update associated items status as well
+      await supabase
+        .from('chalan_bilties')
+        .update({ status: newStatus })
+        .eq('chalan_id', id);
       
       // Update local state without refetching for speed
       if (newStatus === 'Received') {
@@ -59,6 +65,64 @@ const TransitTracking = () => {
     } catch (err) {
       console.error('Error updating status:', err);
       alert('Error: ' + err.message);
+    }
+  };
+  const handleDeleteChalan = async (chalan) => {
+    if (!window.confirm(`Are you sure you want to DELETE Chalan #${chalan.chalan_no}? This will restore all items back to Karachi Warehouse.`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // 1. Get all bilties in this chalan
+      const { data: cbItems, error: cbError } = await supabase
+        .from('chalan_bilties')
+        .select('bilty_id, loaded_quantity')
+        .eq('chalan_id', chalan.id);
+
+      if (cbError) throw cbError;
+
+      // 2. Restore bilty quantities and status
+      for (const item of (cbItems || [])) {
+        // We need the current remaining_quantity to add back the loaded one
+        const { data: bilty, error: fetchErr } = await supabase
+          .from('bilties')
+          .select('remaining_quantity')
+          .eq('id', item.bilty_id)
+          .single();
+
+        if (!fetchErr && bilty) {
+          await supabase
+            .from('bilties')
+            .update({
+              remaining_quantity: (bilty.remaining_quantity || 0) + item.loaded_quantity,
+              status: 'Warehouse' // Move back to warehouse
+            })
+            .eq('id', item.bilty_id);
+        }
+      }
+
+      // 3. Delete related records
+      // Delete from broker_ledger first
+      await supabase.from('broker_ledger').delete().eq('chalan_id', chalan.id);
+      
+      // Delete from chalan_bilties explicitly to avoid foreign key issues
+      await supabase.from('chalan_bilties').delete().eq('chalan_id', chalan.id);
+      
+      const { error: delError } = await supabase
+        .from('chalans')
+        .delete()
+        .eq('id', chalan.id);
+
+      if (delError) throw delError;
+
+      alert(`Chalan #${chalan.chalan_no} deleted and items restored to warehouse.`);
+      fetchChalans();
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Error deleting chalan: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,41 +205,7 @@ const TransitTracking = () => {
   };
 
   const triggerPrint = () => {
-    const printContent = document.getElementById('chalan-print-target');
-    if (!printContent) return;
-
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`
-      <html>
-      <head>
-        <title>Chalan Print</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          @page { size: auto; margin: 5mm; }
-        </style>
-      </head>
-      <body>
-        ${printContent.outerHTML}
-      </body>
-      </html>
-    `);
-    doc.close();
-
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-
-    setTimeout(() => document.body.removeChild(iframe), 1000);
+    window.print();
   };
 
   const pendingChalans = chalans.filter(c => c.status === 'Pending');
@@ -211,6 +241,13 @@ const TransitTracking = () => {
             {fetchingForPrint && printChalanData?.id === chalan.id ? <Loader2 size={16} className="animate-spin" /> : <Printer size={16} />} 
             Print
           </button>
+          <button 
+            className="btn" 
+            style={{ backgroundColor: 'var(--danger)', color: 'white' }}
+            onClick={() => handleDeleteChalan(chalan)}
+          >
+            <Trash2 size={16} /> Delete
+          </button>
         </div>
         
         {chalan.status === 'Pending' ? (
@@ -239,9 +276,9 @@ const TransitTracking = () => {
       
       {/* Removed Print Preview Modal */}
 
-      {/* Hidden print target */}
+      {/* Hidden Print Target */}
       {printChalanData && (
-        <div style={{ display: 'none' }} id="chalan-print-target">
+        <div className="print-only" style={{ display: 'none' }} id="chalan-print-target">
           <PrintChalan chalan={printChalanData} bilties={printBiltiesData} />
         </div>
       )}

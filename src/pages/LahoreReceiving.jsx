@@ -11,6 +11,7 @@ const LahoreReceiving = () => {
   const [verificationItems, setVerificationItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [missingColumn, setMissingColumn] = useState(false);
 
   useEffect(() => {
     fetchArrivedChalans();
@@ -53,15 +54,18 @@ const LahoreReceiving = () => {
             sender_name,
             receiver_name,
             total_quantity,
-            remaining_quantity,
-            lahore_quantity
+            remaining_quantity
           )
         `)
         .eq('chalan_id', chalan.id)
-        .in('status', ['Transit', 'Received']); // Items not yet fully processed into Warehouse
+        .neq('status', 'Lahore Warehouse'); // Items not yet fully processed into Warehouse
 
       if (error) throw error;
       
+      if (data && data.length > 0 && data[0].bilties && !('lahore_quantity' in data[0].bilties)) {
+          setMissingColumn(true);
+      }
+
       // Initialize validation inputs
       const itemsWithInput = (data || []).map(item => ({
         ...item,
@@ -102,21 +106,40 @@ const LahoreReceiving = () => {
 
         // 1b. Update main bilties table to restore remaining_quantity
         // We get the current bilty to add the received quantity to its remaining_quantity
-        // This makes sure partial receipts add up correctly if from multiple chalans.
-        const { data: currentBilty, error: fetchErr } = await supabase
-            .from('bilties')
-            .select('lahore_quantity')
-            .eq('id', item.bilty_id)
-            .single();
+        let currentBilty = null;
+        let fetchErr = null;
+        try {
+            const { data, error } = await supabase
+                .from('bilties')
+                .select('*')
+                .eq('id', item.bilty_id)
+                .single();
+            currentBilty = data;
+            fetchErr = error;
+        } catch (e) {
+            fetchErr = e;
+        }
             
         if (!fetchErr && currentBilty) {
-            await supabase
+            // Update bilty status and safely try to update lahore_quantity
+            const updatePayload = { status: 'Lahore Warehouse' };
+            // If lahore_quantity exists in our fetched object, we can try to update it
+            if ('lahore_quantity' in currentBilty) {
+                updatePayload.lahore_quantity = Number(currentBilty.lahore_quantity || 0) + received;
+            } else {
+                setMissingColumn(true);
+            }
+            
+            const { error: biltyUpdateError } = await supabase
               .from('bilties')
-              .update({
-                  status: 'Lahore Warehouse',
-                  lahore_quantity: Number(currentBilty.lahore_quantity || 0) + received
-              })
+              .update(updatePayload)
               .eq('id', item.bilty_id);
+
+            // If it failed because of missing column, we still want to finish the rest
+            if (biltyUpdateError && biltyUpdateError.code === '42703') {
+                console.warn('lahore_quantity column missing, only status updated.');
+                setMissingColumn(true);
+            } else if (biltyUpdateError) throw biltyUpdateError;
         }
 
 
@@ -160,6 +183,21 @@ const LahoreReceiving = () => {
           <p className="text-muted mt-1">Verify arrived truck inventory against bilties and manage shortages.</p>
         </div>
       </div>
+
+      {missingColumn && (
+        <div className="card mb-4" style={{ background: '#fff7ed', border: '1px solid #ffedd5', color: '#9a3412' }}>
+          <div className="flex items-start gap-4">
+            <div style={{ fontSize: '1.5rem' }}>⚠️</div>
+            <div>
+              <h3 className="font-bold mb-1 text-sm">Action Needed: Quantities will not be saved!</h3>
+              <p className="text-xs mb-2">The database column for Lahore inventory is missing. Run this SQL in Supabase to enable tracking:</p>
+              <pre style={{ background: '#fed7aa', padding: '0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                ALTER TABLE bilties ADD COLUMN IF NOT EXISTS lahore_quantity NUMERIC DEFAULT 0;
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-6" style={{ alignItems: 'flex-start' }}>
         

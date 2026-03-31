@@ -371,12 +371,12 @@ const BiltyHistory = () => {
                           borderRadius: '8px',
                           fontWeight: 700,
                           background: bilty.payment_status === 'Advance Fare' ? '#eff6ff' : 
-                                     bilty.payment_status === 'To Pay (Paid)' ? '#ecfdf5' : '#fffbeb',
+                                     (bilty.payment_status === 'To Pay (Paid)' || bilty.payment_status === 'To Pay') ? '#ecfdf5' : '#fffbeb',
                           color: bilty.payment_status === 'Advance Fare' ? '#2563eb' : 
-                                 bilty.payment_status === 'To Pay (Paid)' ? '#059669' : '#d97706',
+                                 (bilty.payment_status === 'To Pay (Paid)' || bilty.payment_status === 'To Pay') ? '#059669' : '#d97706',
                           border: `1px solid ${
                             bilty.payment_status === 'Advance Fare' ? '#dbeafe' : 
-                            bilty.payment_status === 'To Pay (Paid)' ? '#d1fae5' : '#fef3c7'
+                            (bilty.payment_status === 'To Pay (Paid)' || bilty.payment_status === 'To Pay') ? '#d1fae5' : '#fef3c7'
                           }`
                         }}>
                           {bilty.payment_status}

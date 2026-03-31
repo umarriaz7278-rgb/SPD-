@@ -97,41 +97,7 @@ const ChalanManagement = () => {
   const totalProfit = totalChalanAmount - deliveryDeduction - Number(chalanForm.labourCost) - Number(chalanForm.vehicleExpense);
 
   const handlePrint = () => {
-    const printContent = document.getElementById('chalan-print-target');
-    if (!printContent) return;
-
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`
-      <html>
-      <head>
-        <title>Chalan Print</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          @page { size: auto; margin: 5mm; }
-        </style>
-      </head>
-      <body>
-        ${printContent.outerHTML}
-      </body>
-      </html>
-    `);
-    doc.close();
-
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-
-    setTimeout(() => document.body.removeChild(iframe), 1000);
+    window.print();
   };
 
   const handleCreateChalan = async (e) => {
@@ -171,11 +137,16 @@ const ChalanManagement = () => {
       const cbInserts = selectedList.map(item => ({
         chalan_id: chalanData.id,
         bilty_id: item.id,
-        loaded_quantity: item.loadedQuantity
+        loaded_quantity: item.loadedQuantity,
+        status: 'Transit'
       }));
 
       const { error: cbError } = await supabase.from('chalan_bilties').insert(cbInserts);
-      if (cbError) throw cbError;
+      if (cbError) {
+        // Rollback: delete the created chalan so it doesn't become an empty ghost chalan
+        await supabase.from('chalans').delete().eq('id', chalanData.id);
+        throw new Error("Failed to link Bilties to Chalan: " + cbError.message);
+      }
 
       // 3. Update Bilties Remaining Quantity & Status
       for (const item of selectedList) {
@@ -236,9 +207,8 @@ const ChalanManagement = () => {
 
       alert("Chalan " + chalanData.chalan_no + " Created Successfully!");
       
-      setSavedChalan(chalanData);
-      setSavedBilties([...selectedList]);
-      // Removed setShowPrintPreview(true)
+      setPrintChalanData(chalanData);
+      setPrintBiltiesData([...selectedList]);
 
       setTimeout(() => {
         handlePrint();
@@ -271,12 +241,10 @@ const ChalanManagement = () => {
   return (
     <div className="page-container animate-fade-in flex gap-6" style={{ alignItems: 'flex-start' }}>
 
-      {/* Removed Print Preview Modal */}
-
-      {/* Hidden print target */}
-      {savedChalan && (
-        <div style={{ display: 'none' }} id="chalan-print-target">
-          <PrintChalan chalan={savedChalan} bilties={savedBilties} />
+      {/* Hidden Print Target */}
+      {printChalanData && (
+        <div className="print-only" style={{ display: 'none' }} id="chalan-print-target">
+          <PrintChalan chalan={printChalanData} bilties={printBiltiesData} />
         </div>
       )}
       
