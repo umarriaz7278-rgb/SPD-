@@ -17,10 +17,12 @@ const Sidebar = ({ isOpen, onClose }) => {
   return (
     <aside className={`sidebar${isOpen ? ' sidebar-mobile-open' : ''}`}>
       <div className="sidebar-brand">
-        <Truck size={22} />
+        <div className="sidebar-brand-logo">
+          <Truck size={20} />
+        </div>
         <div>
-          <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1d4ed8' }}>SPD Transport</div>
-          <div style={{ fontSize: '0.65rem', color: '#c0152a', fontWeight: 700, letterSpacing: '0.05em' }}>GOODS TRANSPORT</div>
+          <div style={{ fontWeight: 800, fontSize: '0.88rem', color: '#ffffff', lineHeight: 1.2 }}>SPD Transport</div>
+          <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.6)', fontWeight: 600, letterSpacing: '0.06em', marginTop: '2px' }}>GOODS TRANSPORT</div>
         </div>
       </div>
       <nav className="sidebar-nav" onClick={onClose}>
@@ -89,7 +91,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       </nav>
 
       {/* Bottom version tag */}
-      <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid var(--border)', fontSize: '0.7rem', color: '#1d4ed8', textAlign: 'center', opacity: 0.9, fontWeight: 700 }}>
+      <div style={{ padding: '0.85rem 1rem', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', textAlign: 'center', fontWeight: 600, letterSpacing: '0.04em' }}>
         SPD Transport System v1.0
       </div>
     </aside>
