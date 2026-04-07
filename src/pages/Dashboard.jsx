@@ -252,7 +252,7 @@ const Dashboard = () => {
       </div>
 
       {/* Bottom Row */}
-      <div className="dash-grid-bottom" style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr' }}>
+      <div className="dash-grid-bottom">
 
         {/* Revenue Chart */}
         <div className="dash-card">
