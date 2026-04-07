@@ -23,7 +23,9 @@
 
 /* Sidebar Styles - Professional Light Theme */
 .sidebar {
-  width: 250px;
+  width: fit-content;
+  min-width: 170px;
+  max-width: 210px;
   background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
@@ -43,7 +45,7 @@
   font-weight: 700;
   font-size: 1rem;
 }
-.sidebar-brand svg { color: var(--primary); }
+.sidebar-brand svg { color: var(--red, #c0152a); }
 
 .sidebar-nav {
   padding: 1rem 0;
@@ -59,7 +61,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
-  color: var(--text-muted);
+  color: #1d4ed8;
   text-decoration: none;
   font-weight: 500;
   font-size: 0.85rem;
@@ -70,15 +72,15 @@
 }
 
 .nav-item:hover {
-  background-color: var(--primary-light);
-  color: var(--primary);
+  background-color: #fff1f2;
+  color: #c0152a;
 }
 
 .nav-item.active {
-  background: var(--primary-light);
-  color: var(--primary);
-  border-left-color: var(--primary);
-  font-weight: 600;
+  background: #fff1f2;
+  color: #c0152a;
+  border-left-color: #c0152a;
+  font-weight: 700;
 }
 
 .nav-section {
@@ -87,8 +89,8 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 700;
-  color: var(--text-muted);
-  opacity: 0.6;
+  color: #c0152a;
+  opacity: 0.85;
 }
 
 /* Sidebar bottom CTA */
@@ -139,7 +141,10 @@
 
 .header-company-name {
   font-weight: 800;
-  color: var(--primary);
+  background: linear-gradient(90deg, #c0152a 0%, #1d4ed8 60%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-size: 1rem;
   letter-spacing: 0.02em;
 }
@@ -147,5 +152,137 @@
 .header-company-contact {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+/* ── Hamburger button (hidden on desktop) ── */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem;
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* Sidebar overlay (mobile) */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9;
+}
+
+/* ── MOBILE BREAKPOINT ── */
+@media (max-width: 768px) {
+
+  /* Overlay */
+  .sidebar-overlay {
+    display: block;
+  }
+
+  /* Hamburger visible on mobile */
+  .hamburger-btn {
+    display: flex;
+  }
+
+  /* Sidebar hidden off-screen by default on mobile */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 10;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 210px;
+    max-width: 240px;
+    width: 240px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sidebar.sidebar-mobile-open {
+    transform: translateX(0);
+  }
+
+  /* Header adjustments */
+  .header {
+    padding: 0 1rem;
+    height: auto;
+    min-height: 56px;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .header-company-name {
+    font-size: 0.78rem;
+  }
+
+  .header-company-contact {
+    font-size: 0.65rem;
+  }
+
+  /* Hide search bar on mobile to save space */
+  .header-search {
+    display: none;
+  }
+
+  /* Logout label text hidden on very small screens */
+  .logout-text {
+    display: none;
+  }
+
+  /* Page content padding */
+  .page-container {
+    padding: 1rem;
+  }
+
+  /* Tables scroll horizontally */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 520px;
+  }
+
+  /* Grid columns collapse on mobile */
+  .grid-cols-2,
+  .grid-cols-4,
+  .grid-cols-5,
+  .grid-cols-6,
+  .grid-cols-7 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Cards full width */
+  .card {
+    padding: 1rem;
+  }
+
+  /* Buttons wrap */
+  .flex.items-center.justify-between {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
 }
 

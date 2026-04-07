@@ -435,7 +435,6 @@ Then refresh this page and try again.`);
              <div className="bilty-number-date">Date: {formData.date}</div>
              <div style={{ fontSize: '0.65rem', opacity: 0.75 }}>Unlimited & Auto-Generated</div>
           </div>
-          <div className="bilty-status-badge">🏭 Warehouse Ready</div>
         </div>
       </div>
 
@@ -448,11 +447,11 @@ Then refresh this page and try again.`);
           <h2 className="text-xs font-bold border-b mb-2 pb-1 text-primary flex items-center gap-2">🗺️ Route & Trip Details</h2>
           <div className="grid grid-cols-4 gap-4">
             <div className="input-group">
-              <label className="input-label text-2xs flex items-center gap-1"><MapPin size={10} className="text-primary"/> From City</label>
+              <label className="input-label text-2xs flex items-center gap-1"><MapPin size={10} className="text-primary"/> From Booking</label>
               <input required type="text" name="fromCity" value={formData.fromCity} onChange={handleInputChange} className="input text-sm p-2" style={{height: '32px'}} />
             </div>
             <div className="input-group">
-              <label className="input-label text-2xs flex items-center gap-1"><MapPin size={10} className="text-primary"/> To City</label>
+              <label className="input-label text-2xs flex items-center gap-1"><MapPin size={10} className="text-primary"/> Destination</label>
               <input required type="text" name="toCity" value={formData.toCity} onChange={handleInputChange} className="input text-sm p-2" style={{height: '32px'}} />
             </div>
             <div className="input-group">
@@ -557,7 +556,7 @@ Then refresh this page and try again.`);
 
         {/* Karaya & Payment Section */}
         <div className="card p-compact">
-          <h2 className="text-xs font-bold border-b mb-2 pb-1 text-primary flex items-center gap-2">💰 Karaya & Payment</h2>
+          <h2 className="text-xs font-bold border-b mb-2 pb-1 text-primary flex items-center gap-2">💰 Payments & Additional Charges</h2>
           
           {/* Main Charges Row */}
           <div className="grid grid-cols-6 gap-3 mb-3 items-end">
@@ -578,7 +577,7 @@ Then refresh this page and try again.`);
               <input type="number" name="otherExpenseAmount" value={formData.otherExpenseAmount} onChange={handleInputChange} className="input text-sm p-2" placeholder="0" />
             </div>
             <div className="input-group">
-               <label className="input-label font-bold text-primary text-2xs text-center">Total Karaya</label>
+               <label className="input-label font-bold text-primary text-2xs text-center">Total Amount</label>
                <div className="input font-bold text-primary bg-blue-50 border-blue-200 flex items-center justify-center text-sm" style={{ height: '32px' }}>
                 Rs. {totalCharges.toLocaleString()}
                </div>

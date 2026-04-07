@@ -1,9 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary: #2563eb; /* cleaner professional blue */
-  --primary-hover: #1d4ed8;
+  --primary: #1d4ed8; /* deep professional blue */
+  --primary-hover: #1e3a8a;
   --primary-light: #eff6ff;
+  --red: #c0152a;       /* company red */
+  --red-hover: #9b1020;
+  --red-light: #fff1f2;
   --secondary: #64748b;
   --background: #ffffff;
   --surface: #f8fafc;

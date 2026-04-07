@@ -14,7 +14,10 @@ import CashLedger from './pages/CashLedger';
 import PartyLedger from './pages/PartyLedger';
 import BiltyHistory from './pages/BiltyHistory';
 import LahoreCashLedger from './pages/LahoreCashLedger';
+import MainOwnerCashLedger from './pages/MainOwnerCashLedger';
+import HammadCashLedger from './pages/HammadCashLedger';
 import BrokerRecord from './pages/BrokerRecord';
+import Invoices from './pages/Invoices';
 import VehicleManagement from './pages/VehicleManagement';
 import VehicleDetail from './pages/VehicleDetail';
 import Login from './pages/Login';
@@ -53,7 +56,10 @@ function App() {
           <Route path="ledger/party" element={<PartyLedger />} />
           <Route path="bilty-history" element={<BiltyHistory />} />
           <Route path="ledger/lahore" element={<LahoreCashLedger />} />
+          <Route path="ledger/main-owner" element={<MainOwnerCashLedger />} />
+          <Route path="ledger/hammad" element={<HammadCashLedger />} />
           <Route path="broker-record" element={<BrokerRecord />} />
+          <Route path="invoices" element={<Invoices />} />
           <Route path="vehicles" element={<VehicleManagement />} />
           <Route path="vehicles/:id" element={<VehicleDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />
