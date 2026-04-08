@@ -54,7 +54,8 @@ const LahoreReceiving = () => {
             sender_name,
             receiver_name,
             total_quantity,
-            remaining_quantity
+            remaining_quantity,
+            lahore_quantity
           )
         `)
         .eq('chalan_id', chalan.id)

@@ -1,5 +1,20 @@
--- Run this in Supabase SQL Editor to fix delivery_logs table
--- This adds the missing columns for receiver CNIC and delivered quantity
+-- Run this in Supabase SQL Editor to create/fix delivery_logs table
+
+-- Step 1: Create table if it doesn't exist
+CREATE TABLE IF NOT EXISTS delivery_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    bilty_id UUID REFERENCES bilties(id) ON DELETE CASCADE,
+    receiver_name TEXT,
+    receiver_phone TEXT,
+    receiver_cnic TEXT,
+    delivered_quantity NUMERIC NOT NULL DEFAULT 0,
+    delivery_date DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+ALTER TABLE delivery_logs ENABLE ROW LEVEL SECURITY;
+
+-- Step 2: Add any missing columns (safe to run even if columns already exist)
 
 -- Add receiver_name column (if table has received_by instead)
 DO $$ 

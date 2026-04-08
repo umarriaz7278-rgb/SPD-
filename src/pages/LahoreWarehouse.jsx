@@ -93,19 +93,16 @@ const LahoreWarehouse = () => {
 
       if (biltyUpdateError) throw biltyUpdateError;
 
-      // 3. Attempt to save delivery log (Gracefully fail if table doesn't exist yet)
-      try {
-        await supabase.from('delivery_logs').insert({
-          bilty_id: selectedBilty.id,
-          receiver_name: deliveryData.receiverName,
-          receiver_phone: deliveryData.receiverPhone,
-          receiver_cnic: deliveryData.receiverCnic,
-          delivered_quantity: deliveryQty,
-          delivery_date: new Date().toISOString().split('T')[0]
-        });
-      } catch (logErr) {
-        console.warn('Delivery log table might not exist yet:', logErr);
-      }
+      // 3. Save delivery log (required for Invoices page)
+      const { error: logError } = await supabase.from('delivery_logs').insert({
+        bilty_id: selectedBilty.id,
+        receiver_name: deliveryData.receiverName,
+        receiver_phone: deliveryData.receiverPhone,
+        receiver_cnic: deliveryData.receiverCnic,
+        delivered_quantity: deliveryQty,
+        delivery_date: new Date().toISOString().split('T')[0]
+      });
+      if (logError) throw logError;
 
       alert("Goods Delivered Successfully!");
       setShowDeliveryModal(false);
@@ -113,7 +110,7 @@ const LahoreWarehouse = () => {
 
     } catch (error) {
       console.error("Delivery Error:", error);
-      alert("Error confirming delivery. Check console.");
+      alert("Error confirming delivery: " + (error?.message || JSON.stringify(error)));
     } finally {
       setSaving(false);
     }
