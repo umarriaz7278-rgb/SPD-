@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Loader2, Eye, ArrowLeft, Printer } from 'lucide-react';
+import { FileText, Loader2, Eye, ArrowLeft, Printer, CreditCard, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
 const Invoices = () => {
+  const navigate = useNavigate();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [showPaymentMenu, setShowPaymentMenu] = useState(false);
+  const [showCashModal, setShowCashModal] = useState(false);
+  const [cashType, setCashType] = useState('');
+  const [cashPayment, setCashPayment] = useState({ date: new Date().toISOString().split('T')[0], description: '', amount: '' });
+  const [cashSaving, setCashSaving] = useState(false);
 
   // Additional charges state
   const [charges, setCharges] = useState({
@@ -81,6 +88,55 @@ const Invoices = () => {
 
   const handlePrintInvoice = () => {
     window.print();
+  };
+
+  const handlePaymentOption = (option) => {
+    setShowPaymentMenu(false);
+    if (option === 'party') {
+      // Save invoice+totalAmount to localStorage for Party Accounts to pick up
+      const saved = localStorage.getItem('invoice_charges_' + selectedInvoice.id);
+      const parsed = saved ? JSON.parse(saved) : { charges: {}, taxPercent: '' };
+      const freight = Number(selectedInvoice.bilties?.total_amount || 0);
+      const totalAdditionalAmt = Object.values(parsed.charges || {}).reduce((s, v) => s + (Number(v) || 0), 0);
+      const grossAmt = freight + totalAdditionalAmt;
+      const taxAmt = grossAmt * (Number(parsed.taxPercent) || 0) / 100;
+      const total = grossAmt + taxAmt;
+      localStorage.setItem('pending_invoice_link', JSON.stringify({
+        invoice_id: selectedInvoice.id,
+        bilty_no: selectedInvoice.bilties?.bilty_no ?? selectedInvoice.bilty_id,
+        receiver_name: selectedInvoice.receiver_name,
+        delivery_date: selectedInvoice.delivery_date,
+        total_amount: total,
+      }));
+      navigate('/party-accounts');
+    } else {
+      setCashType(option === 'lahore' ? 'Cash Received Lahore' : 'Cash Received Karachi');
+      setCashPayment({ date: new Date().toISOString().split('T')[0], description: '', amount: String(totalAmount.toFixed(2)) });
+      setShowCashModal(true);
+    }
+  };
+
+  const handleCashSave = async () => {
+    if (!cashPayment.amount || Number(cashPayment.amount) <= 0) { alert('Enter a valid amount.'); return; }
+    setCashSaving(true);
+    try {
+      const { error } = await supabase.from('party_ledger_entries').insert({
+        party_id: null,
+        date: cashPayment.date,
+        description: cashPayment.description || `${cashType} - Bilty #${selectedInvoice.bilties?.bilty_no ?? selectedInvoice.bilty_id}`,
+        type: 'credit',
+        amount: Number(cashPayment.amount),
+        invoice_id: selectedInvoice.id,
+        payment_type: cashType,
+      });
+      if (error) throw error;
+      alert(`${cashType} recorded successfully!`);
+      setShowCashModal(false);
+    } catch (err) {
+      alert('Error saving payment: ' + err.message);
+    } finally {
+      setCashSaving(false);
+    }
   };
 
   // Auto calculations
@@ -276,8 +332,8 @@ const Invoices = () => {
         </div>
         </div> {/* end invoice-print-area */}
 
-        {/* Save & Print buttons at bottom — hidden on print */}
-        <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
+        {/* Save, Print & Payment buttons at bottom — hidden on print */}
+        <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
           <button
             onClick={handleSaveInvoice}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.75rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--success)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
@@ -290,7 +346,61 @@ const Invoices = () => {
           >
             <Printer size={16} /> Print Invoice
           </button>
+          {/* Payment Received */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowPaymentMenu(prev => !prev)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.75rem', borderRadius: 'var(--radius-md)', border: 'none', background: '#7c3aed', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
+            >
+              <CreditCard size={16} /> Payment Received ▾
+            </button>
+            {showPaymentMenu && (
+              <div style={{ position: 'absolute', bottom: '110%', right: 0, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', boxShadow: 'var(--shadow-lg)', overflow: 'hidden', minWidth: '220px', zIndex: 50 }}>
+                <button onClick={() => handlePaymentOption('lahore')} style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', borderBottom: '1px solid var(--border)' }}>
+                  💵 Cash Received Lahore
+                </button>
+                <button onClick={() => handlePaymentOption('karachi')} style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', borderBottom: '1px solid var(--border)' }}>
+                  💵 Cash Received Karachi
+                </button>
+                <button onClick={() => handlePaymentOption('party')} style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', color: 'var(--primary)' }}>
+                  👤 Go to Party Accounts
+                </button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Cash Payment Modal */}
+        {showCashModal && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '16px', width: '100%', maxWidth: '420px', margin: '1rem', padding: '1.75rem', boxShadow: 'var(--shadow-lg)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#7c3aed' }}><CreditCard size={16} style={{ display: 'inline', marginRight: '0.4rem' }} />{cashType}</h3>
+                <button onClick={() => setShowCashModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={20} /></button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Date</label>
+                  <input type="date" value={cashPayment.date} onChange={e => setCashPayment(p => ({ ...p, date: e.target.value }))} style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1px solid var(--border)', fontSize: '0.875rem', background: 'var(--background)', color: 'var(--text-main)', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Description</label>
+                  <input type="text" value={cashPayment.description} onChange={e => setCashPayment(p => ({ ...p, description: e.target.value }))} placeholder="Optional note..." style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1px solid var(--border)', fontSize: '0.875rem', background: 'var(--background)', color: 'var(--text-main)', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem', textTransform: 'uppercase' }}>Amount (Rs)</label>
+                  <input type="number" value={cashPayment.amount} onChange={e => setCashPayment(p => ({ ...p, amount: e.target.value }))} style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '7px', border: '1px solid var(--border)', fontSize: '0.875rem', background: 'var(--background)', color: 'var(--text-main)', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+                <button onClick={() => setShowCashModal(false)} style={{ flex: 1, padding: '0.6rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem' }}>Cancel</button>
+                <button onClick={handleCashSave} disabled={cashSaving} style={{ flex: 1, padding: '0.6rem', borderRadius: 'var(--radius-md)', border: 'none', background: '#7c3aed', color: 'white', fontWeight: 700, cursor: cashSaving ? 'not-allowed' : 'pointer', fontSize: '0.875rem' }}>
+                  {cashSaving ? 'Saving...' : 'Save Payment'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
