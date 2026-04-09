@@ -58,12 +58,29 @@ const Invoices = () => {
 
   const handleOpenInvoice = (inv) => {
     setSelectedInvoice(inv);
-    setCharges({ containerCharges: '', karachiLocalCharges: '', lahoreLocalCharges: '', laborCharges: '', godownCharges: '', otherCharges: '' });
-    setTaxPercent('');
+    // Load previously saved charges from localStorage
+    const saved = localStorage.getItem('invoice_charges_' + inv.id);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setCharges(parsed.charges || { containerCharges: '', karachiLocalCharges: '', lahoreLocalCharges: '', laborCharges: '', godownCharges: '', otherCharges: '' });
+      setTaxPercent(parsed.taxPercent || '');
+    } else {
+      setCharges({ containerCharges: '', karachiLocalCharges: '', lahoreLocalCharges: '', laborCharges: '', godownCharges: '', otherCharges: '' });
+      setTaxPercent('');
+    }
   };
 
   const handleCloseInvoice = () => {
     setSelectedInvoice(null);
+  };
+
+  const handleSaveInvoice = () => {
+    localStorage.setItem('invoice_charges_' + selectedInvoice.id, JSON.stringify({ charges, taxPercent }));
+    alert('Invoice saved successfully!');
+  };
+
+  const handlePrintInvoice = () => {
+    window.print();
   };
 
   // Auto calculations
@@ -107,8 +124,19 @@ const Invoices = () => {
 
     return (
       <div style={{ padding: '2rem', maxWidth: '860px', margin: '0 auto', fontFamily: "'Inter', sans-serif", color: 'var(--text-main)' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' }}>
+        {/* Print-only styles */}
+        <style>{`
+          @media print {
+            body * { visibility: hidden; }
+            #invoice-print-area, #invoice-print-area * { visibility: visible; }
+            #invoice-print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 1.5rem; }
+            .no-print { display: none !important; }
+            input { border: none !important; background: transparent !important; }
+          }
+        `}</style>
+
+        {/* Header — hidden on print */}
+        <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' }}>
           <button
             onClick={handleCloseInvoice}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
@@ -118,6 +146,27 @@ const Invoices = () => {
           <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <FileText size={20} /> Invoice — Bilty #{inv.bilties?.bilty_no ?? inv.bilty_id}
           </h2>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button
+              onClick={handleSaveInvoice}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.25rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--success)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+            >
+              💾 Save
+            </button>
+            <button
+              onClick={handlePrintInvoice}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.25rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+            >
+              <Printer size={15} /> Print
+            </button>
+          </div>
+        </div>
+
+        {/* Printable area */}
+        <div id="invoice-print-area">
+        {/* Print heading — only visible on print */}
+        <div style={{ display: 'none' }} className="print-header">
+          <style>{`.print-header { display: none; } @media print { .print-header { display: block !important; text-align: center; marginBottom: '1rem'; } }`}</style>
         </div>
 
         {/* Delivery Details Card */}
@@ -224,6 +273,23 @@ const Invoices = () => {
               <span style={{ fontSize: '1.2rem', fontWeight: 900, color: 'white' }}>Rs {totalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
             </div>
           </div>
+        </div>
+        </div> {/* end invoice-print-area */}
+
+        {/* Save & Print buttons at bottom — hidden on print */}
+        <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
+          <button
+            onClick={handleSaveInvoice}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.75rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--success)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
+          >
+            💾 Save Invoice
+          </button>
+          <button
+            onClick={handlePrintInvoice}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.75rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
+          >
+            <Printer size={16} /> Print Invoice
+          </button>
         </div>
       </div>
     );
