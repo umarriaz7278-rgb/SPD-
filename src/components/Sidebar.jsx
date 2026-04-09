@@ -82,9 +82,6 @@ const Sidebar = ({ isOpen, onClose }) => {
         <NavLink to="/ledger/hammad" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
           <Wallet size={17} /> Hammad Cash Ledger
         </NavLink>
-        <NavLink to="/ledger/party" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
-          <Users size={17} /> Party Ledger
-        </NavLink>
         <NavLink to="/broker-record" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
           <Users size={17} /> Broker Record
         </NavLink>
