@@ -18,6 +18,7 @@ import MainOwnerCashLedger from './pages/MainOwnerCashLedger';
 import HammadCashLedger from './pages/HammadCashLedger';
 import BrokerRecord from './pages/BrokerRecord';
 import Invoices from './pages/Invoices';
+import PartyAccounts from './pages/PartyAccounts';
 import VehicleManagement from './pages/VehicleManagement';
 import VehicleDetail from './pages/VehicleDetail';
 import Login from './pages/Login';
@@ -60,6 +61,7 @@ function App() {
           <Route path="ledger/hammad" element={<HammadCashLedger />} />
           <Route path="broker-record" element={<BrokerRecord />} />
           <Route path="invoices" element={<Invoices />} />
+          <Route path="party-accounts" element={<PartyAccounts />} />
           <Route path="vehicles" element={<VehicleManagement />} />
           <Route path="vehicles/:id" element={<VehicleDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />

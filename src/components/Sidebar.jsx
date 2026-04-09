@@ -88,6 +88,9 @@ const Sidebar = ({ isOpen, onClose }) => {
         <NavLink to="/broker-record" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
           <Users size={17} /> Broker Record
         </NavLink>
+        <NavLink to="/party-accounts" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
+          <Users size={17} /> Party Accounts
+        </NavLink>
       </nav>
 
       {/* Bottom version tag */}
