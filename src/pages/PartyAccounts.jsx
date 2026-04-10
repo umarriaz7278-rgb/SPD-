@@ -117,7 +117,7 @@ const PartyAccounts = () => {
         party_id: party.id,
         date: inv.delivery_date || new Date().toISOString().split('T')[0],
         description: `Invoice - Bilty #${inv.bilty_no} | ${inv.receiver_name}`,
-        type: 'debit', amount: Number(inv.total_amount), invoice_id: inv.invoice_id, payment_type: null,
+        entry_type: 'debit', amount: Number(inv.total_amount), invoice_id: inv.invoice_id, payment_type: null,
       });
       if (error) throw error;
       alert(`Invoice #${inv.bilty_no} linked to ${party.party_name}!`);
@@ -132,7 +132,7 @@ const PartyAccounts = () => {
     try {
       const { error } = await supabase.from('party_ledger_entries').insert({
         party_id: selectedParty.id, date: new Date().toISOString().split('T')[0],
-        description: 'Opening Balance', type: 'opening_balance', amount: Number(openingAmount), invoice_id: null, payment_type: null,
+        description: 'Opening Balance', entry_type: 'opening_balance', amount: Number(openingAmount), invoice_id: null, payment_type: null,
       });
       if (error) throw error;
       setShowOpeningModal(false); setOpeningAmount(''); await fetchLedger(selectedParty.id);
@@ -145,7 +145,7 @@ const PartyAccounts = () => {
     try {
       const { error } = await supabase.from('party_ledger_entries').insert({
         party_id: selectedParty.id, date: payment.date,
-        description: payment.description || 'Payment Received', type: 'credit',
+        description: payment.description || 'Payment Received', entry_type: 'credit',
         amount: Number(payment.amount), invoice_id: null, payment_type: payment.payment_type,
       });
       if (error) throw error;
@@ -156,17 +156,17 @@ const PartyAccounts = () => {
   };
 
   /* ── Calculations ── */
-  const totalDebit = ledgerEntries.filter(e => e.type === 'debit').reduce((s, e) => s + Number(e.amount), 0);
-  const totalCredit = ledgerEntries.filter(e => e.type === 'credit').reduce((s, e) => s + Number(e.amount), 0);
-  const openingBal = ledgerEntries.filter(e => e.type === 'opening_balance').reduce((s, e) => s + Number(e.amount), 0);
+  const totalDebit = ledgerEntries.filter(e => e.entry_type === 'debit').reduce((s, e) => s + Number(e.amount), 0);
+  const totalCredit = ledgerEntries.filter(e => e.entry_type === 'credit').reduce((s, e) => s + Number(e.amount), 0);
+  const openingBal = ledgerEntries.filter(e => e.entry_type === 'opening_balance').reduce((s, e) => s + Number(e.amount), 0);
   const balance = openingBal + totalDebit - totalCredit;
 
   /* ══════════════ LEDGER VIEW ══════════════ */
   if (selectedParty) {
     let runningBalance = 0;
     const rows = ledgerEntries.map(entry => {
-      if (entry.type === 'opening_balance' || entry.type === 'debit') runningBalance += Number(entry.amount);
-      else if (entry.type === 'credit') runningBalance -= Number(entry.amount);
+      if (entry.entry_type === 'opening_balance' || entry.entry_type === 'debit') runningBalance += Number(entry.amount);
+      else if (entry.entry_type === 'credit') runningBalance -= Number(entry.amount);
       return { ...entry, running: runningBalance };
     });
 
@@ -243,15 +243,15 @@ const PartyAccounts = () => {
                         {entry.payment_type && <span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)' }}>{entry.payment_type}</span>}
                       </td>
                       <td style={tdS}>
-                        <span style={{ padding: '0.2rem 0.55rem', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: 700, background: entry.type === 'credit' ? '#dcfce7' : entry.type === 'opening_balance' ? '#e0e7ff' : '#fee2e2', color: entry.type === 'credit' ? '#166534' : entry.type === 'opening_balance' ? '#3730a3' : '#991b1b' }}>
-                          {entry.type === 'opening_balance' ? 'Opening' : entry.type === 'debit' ? 'Debit' : 'Credit'}
+                        <span style={{ padding: '0.2rem 0.55rem', borderRadius: '9999px', fontSize: '0.72rem', fontWeight: 700, background: entry.entry_type === 'credit' ? '#dcfce7' : entry.entry_type === 'opening_balance' ? '#e0e7ff' : '#fee2e2', color: entry.entry_type === 'credit' ? '#166534' : entry.entry_type === 'opening_balance' ? '#3730a3' : '#991b1b' }}>
+                          {entry.entry_type === 'opening_balance' ? 'Opening' : entry.entry_type === 'debit' ? 'Debit' : 'Credit'}
                         </span>
                       </td>
                       <td style={{ ...tdS, textAlign: 'right', color: '#dc2626', fontWeight: 700 }}>
-                        {(entry.type === 'debit' || entry.type === 'opening_balance') ? `Rs ${Number(entry.amount).toLocaleString()}` : '—'}
+                        {(entry.entry_type === 'debit' || entry.entry_type === 'opening_balance') ? `Rs ${Number(entry.amount).toLocaleString()}` : '—'}
                       </td>
                       <td style={{ ...tdS, textAlign: 'right', color: 'var(--success)', fontWeight: 700 }}>
-                        {entry.type === 'credit' ? `Rs ${Number(entry.amount).toLocaleString()}` : '—'}
+                        {entry.entry_type === 'credit' ? `Rs ${Number(entry.amount).toLocaleString()}` : '—'}
                       </td>
                       <td style={{ ...tdS, textAlign: 'right', fontWeight: 800, color: entry.running > 0 ? '#dc2626' : 'var(--success)' }}>
                         Rs {Math.abs(entry.running).toLocaleString(undefined, { maximumFractionDigits: 2 })}

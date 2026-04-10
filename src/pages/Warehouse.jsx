@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Filter, Archive, Printer, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { COMPANY } from '../lib/constants';
+import './BiltyCreate.css';
 
 // ──────────────────────────────────────────────
 // PRINT BILTY COMPONENT
@@ -12,8 +13,13 @@ const PrintBilty = ({ bilty, items }) => {
   return (
     <div className="bilty-print-area" style={{ border: '2px solid var(--primary)' }}>
 
-      {/* Company Header */}
-      <div className="print-company-header" style={{ padding: '1.5rem', textAlign: 'center', borderBottom: '4px solid var(--warning)', marginBottom: '10px', background: '#1e3a8a', color: 'white' }}>
+      {/* Company Header Image - Only visible in print */}
+      <div className="print-urdu-header">
+        <img src="/bilty-header.jpg" alt="SPD Header" style={{ width: '100%', display: 'block' }} />
+      </div>
+
+      {/* English Company Header - hidden in print, shown on screen */}
+      <div className="print-company-header screen-only-header" style={{ padding: '1.5rem', textAlign: 'center', borderBottom: '4px solid var(--warning)', marginBottom: '10px', background: '#1e3a8a', color: 'white' }}>
         <h1 style={{ fontSize: '2.2rem', fontWeight: 900, textTransform: 'uppercase', margin: 0, letterSpacing: '1px' }}>{COMPANY.name}</h1>
         <p style={{ fontSize: '1rem', fontWeight: 700, margin: '0.4rem 0', opacity: 0.9, textTransform: 'uppercase' }}>Goods Transport Service</p>
         <div style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.4rem 0' }}>
@@ -226,7 +232,14 @@ const Warehouse = () => {
       {/* Hidden print target */}
       {savedBilty && (
         <div className="print-only" style={{ display: 'none' }} id="bilty-print-target">
-           <PrintBilty bilty={savedBilty} items={savedItems} />
+          <div className="bilty-print-wrapper">
+            <div className="bilty-print-copy">
+              <PrintBilty bilty={savedBilty} items={savedItems} />
+            </div>
+            <div className="bilty-print-copy">
+              <PrintBilty bilty={savedBilty} items={savedItems} />
+            </div>
+          </div>
         </div>
       )}
 

@@ -3,6 +3,115 @@
 /* Hide everything on print except iframe-based content */
 @media print {
   .no-print { display: none !important; }
+
+  /* Show Urdu header, hide English header */
+  .print-urdu-header {
+    display: block !important;
+  }
+  .screen-only-header {
+    display: none !important;
+  }
+
+  /* 2 bilties per A4 page */
+  .bilty-print-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100vh !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .bilty-print-copy {
+    flex: 1 !important;
+    max-height: 49.5vh !important;
+    overflow: hidden !important;
+    page-break-inside: avoid !important;
+  }
+
+  .bilty-print-copy .bilty-print-area {
+    transform-origin: top left;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* Compact all print elements for half-page */
+  .bilty-print-copy .print-bilty-strip {
+    padding: 0.3rem 0.8rem !important;
+    font-size: 0.7rem !important;
+  }
+  .bilty-print-copy .print-bilty-no-big {
+    font-size: 1rem !important;
+  }
+  .bilty-print-copy .print-info-col {
+    padding: 0.4rem 0.8rem !important;
+  }
+  .bilty-print-copy .print-info-col-title {
+    font-size: 0.6rem !important;
+    padding: 0.15rem 0.5rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+  .bilty-print-copy .print-info-row {
+    font-size: 0.72rem !important;
+    margin-bottom: 0.15rem !important;
+  }
+  .bilty-print-copy .print-info-key {
+    min-width: 65px !important;
+    font-size: 0.7rem !important;
+  }
+  .bilty-print-copy .print-goods-table th {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.6rem !important;
+  }
+  .bilty-print-copy .print-goods-table td {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+  .bilty-print-copy .print-payment-section {
+    padding: 0 !important;
+  }
+  .bilty-print-copy .print-payment-block {
+    padding: 0.4rem 0.8rem !important;
+  }
+  .bilty-print-copy .print-payment-title {
+    font-size: 0.6rem !important;
+    margin-bottom: 0.2rem !important;
+  }
+  .bilty-print-copy .print-payment-value {
+    font-size: 1rem !important;
+  }
+  .bilty-print-copy .print-footer {
+    padding: 0.4rem 0.8rem !important;
+    gap: 0.5rem !important;
+  }
+  .bilty-print-copy .print-sign-line {
+    margin-top: 1rem !important;
+    font-size: 0.55rem !important;
+  }
+  .bilty-print-copy .print-terms {
+    padding: 0.3rem 0.8rem !important;
+    font-size: 0.55rem !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 5mm;
+  }
+}
+
+/* Urdu header - hidden on screen, shown in print */
+.print-urdu-header {
+  display: none;
+  position: relative;
+  border-bottom: 3px solid #c00;
+}
+
+/* English header shown on screen */
+.screen-only-header {
+  display: block;
 }
 
 /* Bilty Number Header Badge */

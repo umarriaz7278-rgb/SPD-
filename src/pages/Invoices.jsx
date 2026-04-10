@@ -124,7 +124,7 @@ const Invoices = () => {
         party_id: null,
         date: cashPayment.date,
         description: cashPayment.description || `${cashType} - Bilty #${selectedInvoice.bilties?.bilty_no ?? selectedInvoice.bilty_id}`,
-        type: 'credit',
+        entry_type: 'credit',
         amount: Number(cashPayment.amount),
         invoice_id: selectedInvoice.id,
         payment_type: cashType,

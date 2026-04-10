@@ -5,19 +5,9 @@ const PrintChalan = ({ chalan, bilties }) => {
   return (
     <div className="chalan-print-area" style={{ border: '2px solid #1e3a8a', background: 'white', color: 'black', fontFamily: 'Arial, sans-serif' }}>
       
-      {/* Company Header */}
-      <div className="print-company-header" style={{ background: '#1e3a8a', color: 'white', textAlign: 'center', padding: '1.5rem 2rem', borderBottom: '5px solid #f59e0b' }}>
-        <div className="print-company-title-area">
-          <div className="print-company-name" style={{ fontSize: '1.8rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>{COMPANY.name}</div>
-          <div className="print-company-tagline" style={{ fontSize: '0.85rem', opacity: 0.9, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: '0.2rem', marginBottom: '0.8rem' }}>Goods Transport Service</div>
-        </div>
-        <div className="print-company-contact-bar" style={{ background: 'rgba(255,255,255,0.1)', padding: '0.6rem', borderRadius: '6px', fontSize: '0.8rem', lineHeight: 1.4 }}>
-          <div className="print-contact-row"><strong>Office:</strong> {COMPANY.address}</div>
-          <div className="print-contact-row"><strong>Ph:</strong> {COMPANY.phones}</div>
-          <div className="print-contact-row" style={{ fontSize: '0.75rem', marginTop: '0.2rem' }}>
-            <span>📧 {COMPANY.email}</span> | <span>🌐 {COMPANY.website}</span>
-          </div>
-        </div>
+      {/* Company Header Image */}
+      <div style={{ width: '100%' }}>
+        <img src="/bilty-header.jpg" alt="SPD Header" style={{ width: '100%', display: 'block' }} />
       </div>
 
       {/* Chalan Strip */}

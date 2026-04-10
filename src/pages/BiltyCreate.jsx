@@ -13,8 +13,13 @@ const PrintBilty = ({ bilty, items }) => {
   return (
     <div className="bilty-print-area" style={{ border: '2px solid #1e3a8a' }}>
 
-      {/* Company Header */}
-      <div className="print-company-header" style={{ padding: '1rem', textAlign: 'center', borderBottom: '3px solid #000', marginBottom: '10px' }}>
+      {/* Company Header Image - Only visible in print */}
+      <div className="print-urdu-header">
+        <img src="/bilty-header.jpg" alt="SPD Header" style={{ width: '100%', display: 'block' }} />
+      </div>
+
+      {/* English Company Header - hidden in print, shown on screen */}
+      <div className="print-company-header screen-only-header" style={{ padding: '1rem', textAlign: 'center', borderBottom: '3px solid #000', marginBottom: '10px' }}>
         <h1 style={{ fontSize: '2.2rem', fontWeight: 900, textTransform: 'uppercase', margin: 0, color: '#000', letterSpacing: '1px' }}>{COMPANY.name}</h1>
         <p style={{ fontSize: '1rem', fontWeight: 700, margin: '0.4rem 0', color: '#333', textTransform: 'uppercase' }}>Goods Transport Service</p>
         <div style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.4rem 0', color: '#000' }}>
@@ -105,7 +110,7 @@ const PrintBilty = ({ bilty, items }) => {
               <td><strong>{item.goodsBayan || item.goods_bayan || item.item_name || ''}</strong></td>
               <td style={{ textAlign: 'center' }}>{item.quantity}</td>
               <td style={{ textAlign: 'center' }}>{item.weight}</td>
-              <td style={{ textAlign: 'center' }}>{item.cbm || '-'}</td>
+              <td style={{ textAlign: 'center' }}>{item.cbm || item.additional_weight || '-'}</td>
               <td style={{ textAlign: 'right' }}>Rs {Number(item.amount).toLocaleString()}</td>
             </tr>
           ))}
@@ -307,7 +312,7 @@ const BiltyCreate = () => {
         goods_bayan: item.goodsBayan,
         quantity: Number(item.quantity),
         weight: Number(item.weight),
-        cbm: Number(item.cbm || 0),
+        additional_weight: Number(item.cbm || 0),
         amount: Number(item.amount || 0)
       }));
 
@@ -612,8 +617,13 @@ Then refresh this page and try again.`);
       {/* Hidden print target (only shows in print media) */}
       {savedBilty && (
         <div className="print-only" style={{ display: 'none' }}>
-          <div className="bilty-print-area" ref={printRef}>
-            <PrintBilty bilty={savedBilty} items={savedItems} />
+          <div className="bilty-print-wrapper" ref={printRef}>
+            <div className="bilty-print-copy">
+              <PrintBilty bilty={savedBilty} items={savedItems} />
+            </div>
+            <div className="bilty-print-copy">
+              <PrintBilty bilty={savedBilty} items={savedItems} />
+            </div>
           </div>
         </div>
       )}
