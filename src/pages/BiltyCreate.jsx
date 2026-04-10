@@ -309,7 +309,7 @@ const BiltyCreate = () => {
 
       const itemsToInsert = items.map(item => ({
         bilty_id: biltyData.id,
-        goods_bayan: item.goodsBayan,
+        item_name: item.goodsBayan,
         quantity: Number(item.quantity),
         weight: Number(item.weight),
         additional_weight: Number(item.cbm || 0),

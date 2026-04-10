@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Loader2, Eye, ArrowLeft, Printer, CreditCard, X } from 'lucide-react';
+import { FileText, Loader2, Eye, ArrowLeft, Printer, CreditCard, X, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,6 +24,16 @@ const Invoices = () => {
     otherCharges: '',
   });
   const [taxPercent, setTaxPercent] = useState('');
+
+  // Invoice extra fields
+  const [invoiceFields, setInvoiceFields] = useState({
+    companyName: '',
+    description: '',
+    clearingAgentName: '',
+    containerNumber: '',
+    lcNumber: '',
+    blNumber: '',
+  });
 
   useEffect(() => {
     fetchInvoices();
@@ -71,9 +81,11 @@ const Invoices = () => {
       const parsed = JSON.parse(saved);
       setCharges(parsed.charges || { containerCharges: '', karachiLocalCharges: '', lahoreLocalCharges: '', laborCharges: '', godownCharges: '', otherCharges: '' });
       setTaxPercent(parsed.taxPercent || '');
+      setInvoiceFields(parsed.invoiceFields || { companyName: '', description: '', clearingAgentName: '', containerNumber: '', lcNumber: '', blNumber: '' });
     } else {
       setCharges({ containerCharges: '', karachiLocalCharges: '', lahoreLocalCharges: '', laborCharges: '', godownCharges: '', otherCharges: '' });
       setTaxPercent('');
+      setInvoiceFields({ companyName: '', description: '', clearingAgentName: '', containerNumber: '', lcNumber: '', blNumber: '' });
     }
   };
 
@@ -82,12 +94,24 @@ const Invoices = () => {
   };
 
   const handleSaveInvoice = () => {
-    localStorage.setItem('invoice_charges_' + selectedInvoice.id, JSON.stringify({ charges, taxPercent }));
+    localStorage.setItem('invoice_charges_' + selectedInvoice.id, JSON.stringify({ charges, taxPercent, invoiceFields }));
     alert('Invoice saved successfully!');
   };
 
   const handlePrintInvoice = () => {
     window.print();
+  };
+
+  const handleDeleteInvoice = async (inv) => {
+    if (!window.confirm(`Are you sure you want to delete the invoice for Bilty #${inv.bilties?.bilty_no ?? inv.bilty_id}?`)) return;
+    try {
+      const { error } = await supabase.from('delivery_logs').delete().eq('id', inv.id);
+      if (error) throw error;
+      setInvoices(prev => prev.filter(i => i.id !== inv.id));
+      localStorage.removeItem('invoice_charges_' + inv.id);
+    } catch (err) {
+      alert('Error deleting invoice: ' + err.message);
+    }
   };
 
   const handlePaymentOption = (option) => {
@@ -183,11 +207,24 @@ const Invoices = () => {
         {/* Print-only styles */}
         <style>{`
           @media print {
+            @page { size: A4; margin: 8mm 8mm; }
             body * { visibility: hidden; }
             #invoice-print-area, #invoice-print-area * { visibility: visible; }
-            #invoice-print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 1.5rem; }
+            #invoice-print-area {
+              position: absolute; left: 0; top: 0; width: 100%;
+              padding: 0; font-size: 9px; color: #1a1a1a;
+            }
             .no-print { display: none !important; }
-            input { border: none !important; background: transparent !important; }
+            .print-only { display: flex !important; }
+            .print-only-block { display: block !important; }
+            input {
+              border: none !important; background: transparent !important;
+              box-shadow: none !important; padding: 0 !important;
+              font-weight: 700 !important; color: #1a1a1a !important;
+            }
+            input::placeholder { color: transparent !important; }
+            .invoice-section { box-shadow: none !important; border: 1px solid #d1d5db !important; break-inside: avoid; margin-bottom: 6px !important; padding: 8px 10px !important; }
+            .invoice-section h3 { margin-bottom: 4px !important; font-size: 8px !important; padding-bottom: 2px !important; }
           }
         `}</style>
 
@@ -219,16 +256,82 @@ const Invoices = () => {
         </div>
 
         {/* Printable area */}
-        <div id="invoice-print-area">
-        {/* Print heading — only visible on print */}
-        <div style={{ display: 'none' }} className="print-header">
-          <style>{`.print-header { display: none; } @media print { .print-header { display: block !important; text-align: center; marginBottom: '1rem'; } }`}</style>
+        <div id="invoice-print-area" style={{ maxWidth: '800px', margin: '0 auto' }}>
+
+        {/* ═══ PRINT HEADER — branded top section ═══ */}
+        <div className="print-only" style={{ display: 'none', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #1e40af', paddingBottom: '6px', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '40px', height: '40px', background: '#1e40af', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#fff', fontWeight: 900, fontSize: '14px', letterSpacing: '2px' }}>SPD</span>
+            </div>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 900, color: '#1e40af', lineHeight: 1.2 }}>Super Pak Data Goods Wale Transport Company</div>
+              <div style={{ fontSize: '8px', color: '#475569', marginTop: '1px' }}>Gate No 1 New Truck Stand Hawksbay Karachi</div>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', fontSize: '8px', color: '#475569', lineHeight: 1.5 }}>
+            <div style={{ fontWeight: 700, color: '#1e40af', fontSize: '8.5px', marginBottom: '1px' }}>Karachi Office</div>
+            <div>0300-2024433, 0321-2024433, 0312-2024433</div>
+            <div>0302-2314433, 021-32351333</div>
+            <div>superpakdatawale@gmail.com | www.superpakdata.com</div>
+          </div>
         </div>
 
-        {/* Delivery Details Card */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Delivery Details</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem 2rem' }}>
+        {/* ═══ ON-SCREEN HEADER (visible in browser, hidden on print) ═══ */}
+        <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '3px solid var(--primary)', paddingBottom: '12px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ width: '56px', height: '56px', background: 'var(--primary)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#fff', fontWeight: 900, fontSize: '18px', letterSpacing: '2px' }}>SPD</span>
+            </div>
+            <div>
+              <div style={{ fontSize: '16px', fontWeight: 900, color: 'var(--primary)', lineHeight: 1.2 }}>Super Pak Data Goods Wale Transport Company</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>Gate No 1 New Truck Stand Hawksbay Karachi</div>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', fontSize: '10px', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '11px', marginBottom: '2px' }}>Karachi Office</div>
+            <div>0300-2024433, 0321-2024433, 0312-2024433</div>
+            <div>0302-2314433, 021-32351333</div>
+            <div>superpakdatawale@gmail.com</div>
+            <div>www.superpakdata.com</div>
+          </div>
+        </div>
+
+        {/* Invoice Title Bar */}
+        <div style={{ background: '#1e40af', color: '#fff', textAlign: 'center', padding: '5px 0', borderRadius: '4px', marginBottom: '8px', fontSize: '12px', fontWeight: 800, letterSpacing: '1px' }}>
+          INVOICE — BILTY #{inv.bilties?.bilty_no ?? inv.bilty_id}
+        </div>
+
+        {/* ═══ INVOICE INFORMATION CARD ═══ */}
+        <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 14px', marginBottom: '8px', boxShadow: 'var(--shadow-md)' }}>
+          <h3 style={{ fontSize: '9px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Invoice Information</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px' }}>
+            {[
+              { label: 'Company Name', key: 'companyName', placeholder: 'Enter company name' },
+              { label: 'Description', key: 'description', placeholder: 'Enter description' },
+              { label: 'Clearing Agent Name', key: 'clearingAgentName', placeholder: 'Enter clearing agent name' },
+              { label: 'Container Number', key: 'containerNumber', placeholder: 'Enter container number' },
+              { label: 'LC Number', key: 'lcNumber', placeholder: 'Enter LC number' },
+              { label: 'BL Number', key: 'blNumber', placeholder: 'Enter BL number' },
+            ].map(({ label, key, placeholder }) => (
+              <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '4px', borderBottom: '1px solid #e2e8f0', paddingBottom: '3px' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', minWidth: '110px' }}>{label}:</span>
+                <input
+                  type="text"
+                  placeholder={placeholder}
+                  value={invoiceFields[key]}
+                  onChange={(e) => setInvoiceFields(prev => ({ ...prev, [key]: e.target.value }))}
+                  style={{ flex: 1, padding: '3px 6px', borderRadius: '4px', border: '1px solid var(--border)', fontSize: '11px', fontWeight: 600, background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ═══ DELIVERY DETAILS CARD ═══ */}
+        <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 14px', marginBottom: '8px', boxShadow: 'var(--shadow-md)' }}>
+          <h3 style={{ fontSize: '9px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Delivery Details</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0' }}>
             {[
               ['Bilty Number', `#${inv.bilties?.bilty_no ?? inv.bilty_id}`],
               ['Delivery Date', inv.delivery_date ? new Date(inv.delivery_date).toLocaleDateString() : '—'],
@@ -242,48 +345,46 @@ const Invoices = () => {
               ['To', inv.bilties?.to_city || '—'],
               ['Payment Status', null],
             ].map(([label, value], i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.45rem 0', borderBottom: '1px solid var(--border)' }}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)' }}>{label}</span>
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 8px', borderBottom: '1px solid #e2e8f0', background: i % 2 === 0 ? 'transparent' : '#f8fafc' }}>
+                <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>{label}</span>
                 {label === 'Payment Status' ? (
                   <span style={styles.badge(inv.bilties?.payment_status)}>{inv.bilties?.payment_status || '—'}</span>
                 ) : (
-                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-main)' }}>{value}</span>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: '#1a1a1a' }}>{value}</span>
                 )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Freight & Additional Charges Card */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Freight & Additional Charges</h3>
+        {/* ═══ FREIGHT & CHARGES TABLE ═══ */}
+        <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 14px', marginBottom: '8px', boxShadow: 'var(--shadow-md)' }}>
+          <h3 style={{ fontSize: '9px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Freight & Additional Charges</h3>
 
-          {/* Freight (readonly) */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', marginBottom: '0.5rem', background: 'var(--primary-light)', borderRadius: '8px' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)' }}>Freight (Base Cost)</span>
-            <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--primary)' }}>Rs {freight.toLocaleString()}</span>
-          </div>
-
-          {/* Additional Charge Rows */}
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '0.75rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr>
-                <th style={{ padding: '0.6rem 0.75rem', fontSize: '0.72rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'left', borderBottom: '2px solid var(--border)' }}>Description</th>
-                <th style={{ padding: '0.6rem 0.75rem', fontSize: '0.72rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', textAlign: 'right', borderBottom: '2px solid var(--border)', width: '220px' }}>Amount (Rs)</th>
+              <tr style={{ background: '#1e40af' }}>
+                <th style={{ padding: '4px 8px', fontSize: '9px', fontWeight: 700, color: '#fff', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.04em' }}>Description</th>
+                <th style={{ padding: '4px 8px', fontSize: '9px', fontWeight: 700, color: '#fff', textTransform: 'uppercase', textAlign: 'right', letterSpacing: '0.04em', width: '180px' }}>Amount (Rs)</th>
               </tr>
             </thead>
             <tbody>
-              {chargeRows.map(({ label, key }) => (
-                <tr key={key}>
-                  <td style={{ padding: '0.55rem 0.75rem', fontSize: '0.85rem', borderBottom: '1px solid var(--border)' }}>{label}</td>
-                  <td style={{ padding: '0.4rem 0.75rem', borderBottom: '1px solid var(--border)', textAlign: 'right' }}>
+              {/* Freight base row */}
+              <tr style={{ background: '#eff6ff' }}>
+                <td style={{ padding: '3px 8px', fontSize: '10px', fontWeight: 700, borderBottom: '1px solid #e2e8f0', color: '#1e40af' }}>Freight (Base Cost)</td>
+                <td style={{ padding: '3px 8px', fontSize: '10px', fontWeight: 800, borderBottom: '1px solid #e2e8f0', textAlign: 'right', color: '#1e40af' }}>Rs {freight.toLocaleString()}</td>
+              </tr>
+              {chargeRows.map(({ label, key }, idx) => (
+                <tr key={key} style={{ background: idx % 2 === 0 ? 'transparent' : '#f8fafc' }}>
+                  <td style={{ padding: '3px 8px', fontSize: '10px', borderBottom: '1px solid #e2e8f0' }}>{label}</td>
+                  <td style={{ padding: '2px 8px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>
                     <input
                       type="number"
                       min="0"
                       placeholder="0"
                       value={charges[key]}
                       onChange={(e) => setCharges(prev => ({ ...prev, [key]: e.target.value }))}
-                      style={{ width: '160px', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '0.85rem', fontWeight: 600, textAlign: 'right', background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
+                      style={{ width: '120px', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)', fontSize: '10px', fontWeight: 600, textAlign: 'right', background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
                     />
                   </td>
                 </tr>
@@ -292,20 +393,17 @@ const Invoices = () => {
           </table>
         </div>
 
-        {/* Totals & Tax Card */}
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' }}>Calculations</h3>
+        {/* ═══ CALCULATIONS CARD ═══ */}
+        <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 14px', marginBottom: '8px', boxShadow: 'var(--shadow-md)' }}>
+          <h3 style={{ fontSize: '9px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Calculations</h3>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {/* Gross Without Tax */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', borderBottom: '1px solid var(--border)' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>Gross Amount Without Tax</span>
-              <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-main)' }}>Rs {grossWithoutTax.toLocaleString()}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 8px', borderBottom: '1px solid #e2e8f0' }}>
+              <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>Gross Amount Without Tax</span>
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#1a1a1a' }}>Rs {grossWithoutTax.toLocaleString()}</span>
             </div>
-
-            {/* Tax % input */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border)' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>Tax (%)</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 8px', borderBottom: '1px solid #e2e8f0' }}>
+              <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>Tax (%)</span>
               <input
                 type="number"
                 min="0"
@@ -313,23 +411,39 @@ const Invoices = () => {
                 placeholder="0"
                 value={taxPercent}
                 onChange={(e) => setTaxPercent(e.target.value)}
-                style={{ width: '100px', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '0.85rem', fontWeight: 600, textAlign: 'right', background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
+                style={{ width: '80px', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)', fontSize: '10px', fontWeight: 600, textAlign: 'right', background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
               />
             </div>
-
-            {/* Tax Amount */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', borderBottom: '1px solid var(--border)' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>Tax Amount</span>
-              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--warning)' }}>Rs {taxAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 8px', borderBottom: '1px solid #e2e8f0' }}>
+              <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>Tax Amount</span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#d97706' }}>Rs {taxAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
             </div>
-
-            {/* Total Amount */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', marginTop: '0.25rem', background: 'var(--primary)', borderRadius: '8px' }}>
-              <span style={{ fontSize: '1rem', fontWeight: 800, color: 'white' }}>Total Amount</span>
-              <span style={{ fontSize: '1.2rem', fontWeight: 900, color: 'white' }}>Rs {totalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', marginTop: '4px', background: '#1e40af', borderRadius: '4px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff' }}>Total Amount</span>
+              <span style={{ fontSize: '14px', fontWeight: 900, color: '#fff' }}>Rs {totalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
             </div>
           </div>
         </div>
+
+        {/* ═══ FOOTER — Lahore Office & Signature ═══ */}
+        <div style={{ marginTop: '10px', borderTop: '2px solid #1e40af', paddingTop: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            {/* Lahore Office */}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '8px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', marginBottom: '2px' }}>Lahore Office</div>
+              <div style={{ fontSize: '8px', color: '#475569', lineHeight: 1.4 }}>
+                Super Pak Data Wale Goods Transport Co.<br />
+                Saggian Pull, Hazrat Ali Road, Lahore
+              </div>
+            </div>
+            {/* Signature Box */}
+            <div style={{ width: '180px', textAlign: 'center' }}>
+              <div style={{ borderBottom: '2px solid #1a1a1a', height: '36px', marginBottom: '4px' }}></div>
+              <div style={{ fontSize: '8px', fontWeight: 700, color: '#475569' }}>Authorized Signature & Stamp</div>
+            </div>
+          </div>
+        </div>
+
         </div> {/* end invoice-print-area */}
 
         {/* Save, Print & Payment buttons at bottom — hidden on print */}
@@ -460,9 +574,15 @@ const Invoices = () => {
                         </span>
                       )}
                     </td>
-                    <td style={styles.td}>
-                    <button style={styles.viewBtn} onClick={() => handleOpenInvoice(inv)}>
+                    <td style={{ ...styles.td, display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                      <button style={styles.viewBtn} onClick={() => handleOpenInvoice(inv)}>
                         <Eye size={13} /> View
+                      </button>
+                      <button
+                        onClick={() => handleDeleteInvoice(inv)}
+                        style={{ padding: '0.35rem 0.65rem', borderRadius: 'var(--radius-md)', border: 'none', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: '#fee2e2', color: '#dc2626', transition: 'background 0.2s' }}
+                      >
+                        <Trash2 size={13} /> Delete
                       </button>
                     </td>
                   </tr>
