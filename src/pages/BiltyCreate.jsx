@@ -182,6 +182,9 @@ const BiltyCreate = () => {
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [dbError, setDbError] = useState(null);
   const printRef = useRef();
+  const [isManualBilty, setIsManualBilty] = useState(false);
+  const [manualBiltyNo, setManualBiltyNo] = useState('');
+  const [biltyNoError, setBiltyNoError] = useState('');
 
   const [formData, setFormData] = useState({
     senderName: '',
@@ -272,8 +275,32 @@ const BiltyCreate = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Build bilty object without bilty_no to let DB handle SERIAL auto-increment
+      // Validate manual bilty number if in manual mode
+      if (isManualBilty) {
+        const manualNo = Number(manualBiltyNo);
+        if (!manualBiltyNo || isNaN(manualNo) || manualNo <= 0) {
+          alert('❌ Please enter a valid manual bilty number.');
+          setLoading(false);
+          return;
+        }
+        // Check for duplicate
+        const { data: existing, error: checkError } = await supabase
+          .from('bilties')
+          .select('bilty_no')
+          .eq('bilty_no', manualNo)
+          .limit(1);
+        if (checkError) throw checkError;
+        if (existing && existing.length > 0) {
+          setBiltyNoError(`Bilty #${manualNo} already exists. Please use a different number.`);
+          setLoading(false);
+          return;
+        }
+        setBiltyNoError('');
+      }
+
+      // Build bilty object
       const biltyToInsert = {
+        ...(isManualBilty ? { bilty_no: Number(manualBiltyNo) } : {}),
         sender_name: formData.senderName,
         sender_phone: formData.senderContact,
         receiver_name: formData.receiverName,
@@ -369,6 +396,9 @@ const BiltyCreate = () => {
           otherExpenseName: '', otherExpenseAmount: '' 
         });
         setItems([{ id: Date.now(), goodsBayan: '', quantity: '', weight: '', cbm: '', amount: '' }]);
+        setIsManualBilty(false);
+        setManualBiltyNo('');
+        setBiltyNoError('');
         fetchNextBiltyNo();
       }, 800);
 
@@ -426,19 +456,44 @@ Then refresh this page and try again.`);
         </div>
       )}
 
-      {/* ── AUTO BILTY NUMBER DISPLAY ── */}
+      {/* ── BILTY NUMBER DISPLAY ── */}
       <div className="bilty-number-header no-print">
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <h1 className="text-xl font-bold flex items-center gap-2 text-white"><FileText size={22}/> Create Bilty</h1>
           <div style={{ borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '1.5rem' }}>
-            <div className="bilty-number-label">Auto Bilty No.</div>
-            <div className="bilty-number-value">#{nextBiltyNo}</div>
+            {isManualBilty ? (
+              <>
+                <div className="bilty-number-label">Manual Bilty No.</div>
+                <input
+                  type="number"
+                  value={manualBiltyNo}
+                  onChange={(e) => { setManualBiltyNo(e.target.value); setBiltyNoError(''); }}
+                  placeholder="Enter #"
+                  style={{ width: '100px', padding: '4px 8px', borderRadius: '6px', border: biltyNoError ? '2px solid #ef4444' : '2px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: '1.2rem', fontWeight: 800, textAlign: 'center', outline: 'none' }}
+                />
+                {biltyNoError && <div style={{ color: '#fca5a5', fontSize: '0.65rem', marginTop: '2px', maxWidth: '160px' }}>{biltyNoError}</div>}
+              </>
+            ) : (
+              <>
+                <div className="bilty-number-label">Auto Bilty No.</div>
+                <div className="bilty-number-value">#{nextBiltyNo}</div>
+              </>
+            )}
           </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.75rem', color: 'rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.1)', padding: '4px 12px', borderRadius: '20px', userSelect: 'none' }}>
+            <input
+              type="checkbox"
+              checked={isManualBilty}
+              onChange={(e) => { setIsManualBilty(e.target.checked); setBiltyNoError(''); setManualBiltyNo(''); }}
+              style={{ accentColor: '#facc15' }}
+            />
+            Manual Bilty No.
+          </label>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           <div className="text-right">
              <div className="bilty-number-date">Date: {formData.date}</div>
-             <div style={{ fontSize: '0.65rem', opacity: 0.75 }}>Unlimited & Auto-Generated</div>
+             <div style={{ fontSize: '0.65rem', opacity: 0.75 }}>{isManualBilty ? 'Manual Entry Mode' : 'Unlimited & Auto-Generated'}</div>
           </div>
         </div>
       </div>
