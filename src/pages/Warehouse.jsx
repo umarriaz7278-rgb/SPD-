@@ -245,7 +245,7 @@ const Warehouse = () => {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><Archive className="text-primary"/> Karachi warehouse Inventory</h1>
+          <h1 className="text-2xl font-bold flex items-center gap-2"><Archive className="text-primary"/> Warehouse Inventory</h1>
           <p className="text-muted mt-1">Manage and view all ready bilties waiting to be loaded into chalans.</p>
         </div>
       </div>
@@ -270,9 +270,9 @@ const Warehouse = () => {
 
         <div className="table-wrapper">
           {loading ? (
-            <div className="p-8 text-center text-muted">Loading Karachi warehouse inventory...</div>
+            <div className="p-8 text-center text-muted">Loading warehouse inventory...</div>
           ) : filteredBilties.length === 0 ? (
-            <div className="p-8 text-center text-muted">No bilties found in Karachi warehouse.</div>
+            <div className="p-8 text-center text-muted">No bilties found in warehouse.</div>
           ) : (
             <table>
               <thead>

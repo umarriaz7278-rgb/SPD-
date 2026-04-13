@@ -36,7 +36,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <FileText size={17} /> New Booking
         </NavLink>
         <NavLink to="/warehouse" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
-          <Archive size={17} /> Karachi warehouse
+          <Archive size={17} /> Warehouse
         </NavLink>
         <NavLink to="/chalan" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`}>
           <Truck size={17} /> Challan
