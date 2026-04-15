@@ -409,3 +409,245 @@
   height: 28px !important;
   padding: 0.2rem 0.4rem !important;
 }
+
+/* ── BMA TMS Bilty Entry Form Styles ─────────────────────── */
+.bma-bilty-root {
+  background: #f3f4f6;
+  min-height: 100%;
+  padding: 1.25rem 1.5rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Page header */
+.bma-bilty-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.bma-bilty-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #111827;
+}
+.bma-bilty-icon {
+  font-size: 1.1rem;
+}
+.bma-bilty-header-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+.bma-btn-allbilties {
+  background: #f97316;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.42rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity 0.18s;
+}
+.bma-btn-allbilties:hover { opacity: 0.88; }
+.bma-btn-addnew {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.42rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.18s;
+}
+.bma-btn-addnew:hover { opacity: 0.88; }
+
+/* White card form sections */
+.bma-bilty-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.bma-form-section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  padding: 0.7rem 1rem;
+}
+.bma-form-section:first-of-type {
+  border-radius: 8px 8px 0 0;
+}
+.bma-form-section:last-of-type {
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Grid layouts */
+.bma-form-grid {
+  display: grid;
+  gap: 0.75rem;
+  align-items: end;
+}
+.bma-grid-6 { grid-template-columns: repeat(6, 1fr); }
+.bma-grid-5 { grid-template-columns: repeat(5, 1fr); }
+.bma-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Field */
+.bma-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.bma-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+.bma-req {
+  color: #ef4444;
+  margin-left: 1px;
+}
+.bma-input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  padding: 0 0.55rem;
+  font-size: 0.82rem;
+  color: #111827;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+.bma-input:focus {
+  border-color: #6941C6;
+  box-shadow: 0 0 0 2px rgba(105, 65, 198, 0.1);
+}
+.bma-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  padding-right: 2rem;
+}
+.bma-input-readonly {
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: default;
+  display: flex;
+  align-items: center;
+}
+.bma-field-error {
+  font-size: 0.68rem;
+  color: #ef4444;
+  margin-top: 1px;
+}
+.bma-manual-toggle {
+  font-size: 0.68rem;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+  user-select: none;
+}
+
+/* Action buttons row */
+.bma-form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 0 0.5rem;
+}
+.bma-btn-save {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 2rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.18s;
+  min-width: 130px;
+  justify-content: center;
+}
+.bma-btn-save:disabled { opacity: 0.65; cursor: not-allowed; }
+.bma-btn-save:hover:not(:disabled) { opacity: 0.9; }
+.bma-btn-addmore {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f97316;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 2rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.18s;
+  min-width: 130px;
+  justify-content: center;
+}
+.bma-btn-addmore:hover { opacity: 0.9; }
+.bma-btn-print {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f97316;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 2rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.18s;
+  min-width: 130px;
+  justify-content: center;
+}
+.bma-btn-print:hover { opacity: 0.9; }
+
+/* Additional items table */
+.bma-table-wrap { overflow-x: auto; }
+.bma-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.bma-table th {
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+.bma-table td {
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+.bma-table .bma-input { height: 28px; font-size: 0.78rem; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .bma-grid-6 { grid-template-columns: repeat(3, 1fr); }
+  .bma-grid-5 { grid-template-columns: repeat(3, 1fr); }
+  .bma-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .bma-grid-6,.bma-grid-5,.bma-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .bma-bilty-header { flex-wrap: wrap; gap: 0.5rem; }
+}

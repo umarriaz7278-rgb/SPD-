@@ -427,246 +427,413 @@ Then refresh this page and try again.`);
   };
 
   return (
-    <div className="page-container animate-fade-in">
+    <div className="bma-bilty-root animate-fade-in">
 
       {dbError === 'missing_amount_column' && (
-        <div className="card mb-6" style={{ background: '#fff7ed', border: '1px solid #ffedd5', color: '#9a3412' }}>
-          <div className="flex items-start gap-4">
-            <div style={{ fontSize: '2rem' }}>⚠️</div>
-            <div>
-              <h3 className="font-bold text-lg mb-1">Database Update Required</h3>
-              <p className="mb-3">The "Item Amount" feature is enabled in the code but missing from your database. To fix the Bilty saving and printing, please run this SQL in your Supabase SQL Editor:</p>
-              <pre style={{ background: '#fed7aa', padding: '1rem', borderRadius: '8px', fontSize: '0.8rem', overflowX: 'auto', fontWeight: 'bold', border: '1px solid #fdba74' }}>
-                ALTER TABLE bilty_items ADD COLUMN IF NOT EXISTS amount NUMERIC DEFAULT 0;
-              </pre>
-              <div className="mt-4 flex gap-3">
-                <a 
-                  href="https://app.supabase.com/project/_/sql" 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="btn btn-primary text-xs"
-                  style={{ background: '#9a3412', border: 'none', padding: '0.5rem 1rem', color: 'white' }}
-                >
-                   Open Supabase SQL Editor
-                </a>
-                <p className="text-xs self-center">1. Copy code above. 2. Click button. 3. Paste and Run. 4. Refresh this page.</p>
-              </div>
-            </div>
-          </div>
+        <div style={{ background: '#fff7ed', border: '1px solid #ffedd5', color: '#9a3412', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' }}>
+          <strong>⚠️ Database Update Required:</strong> Run <code>ALTER TABLE bilty_items ADD COLUMN IF NOT EXISTS amount NUMERIC DEFAULT 0;</code> in Supabase SQL Editor, then refresh.
         </div>
       )}
 
-      {/* ── BILTY NUMBER DISPLAY ── */}
-      <div className="bilty-number-header no-print">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-          <h1 className="text-xl font-bold flex items-center gap-2 text-white"><FileText size={22}/> Create Bilty</h1>
-          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '1.5rem' }}>
-            {isManualBilty ? (
-              <>
-                <div className="bilty-number-label">Manual Bilty No.</div>
-                <input
-                  type="number"
-                  value={manualBiltyNo}
-                  onChange={(e) => { setManualBiltyNo(e.target.value); setBiltyNoError(''); }}
-                  placeholder="Enter #"
-                  style={{ width: '100px', padding: '4px 8px', borderRadius: '6px', border: biltyNoError ? '2px solid #ef4444' : '2px solid rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.15)', color: '#fff', fontSize: '1.2rem', fontWeight: 800, textAlign: 'center', outline: 'none' }}
-                />
-                {biltyNoError && <div style={{ color: '#fca5a5', fontSize: '0.65rem', marginTop: '2px', maxWidth: '160px' }}>{biltyNoError}</div>}
-              </>
-            ) : (
-              <>
-                <div className="bilty-number-label">Auto Bilty No.</div>
-                <div className="bilty-number-value">#{nextBiltyNo}</div>
-              </>
-            )}
-          </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.75rem', color: 'rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.1)', padding: '4px 12px', borderRadius: '20px', userSelect: 'none' }}>
-            <input
-              type="checkbox"
-              checked={isManualBilty}
-              onChange={(e) => { setIsManualBilty(e.target.checked); setBiltyNoError(''); setManualBiltyNo(''); }}
-              style={{ accentColor: '#facc15' }}
-            />
-            Manual Bilty No.
-          </label>
+      {/* ── PAGE HEADER ── */}
+      <div className="bma-bilty-header no-print">
+        <div className="bma-bilty-title">
+          <span className="bma-bilty-icon">✈</span>
+          <span>Bilty Entry</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div className="text-right">
-             <div className="bilty-number-date">Date: {formData.date}</div>
-             <div style={{ fontSize: '0.65rem', opacity: 0.75 }}>{isManualBilty ? 'Manual Entry Mode' : 'Unlimited & Auto-Generated'}</div>
-          </div>
+        <div className="bma-bilty-header-actions">
+          <a href="/bilty-history" className="bma-btn-allbilties">All Bilties</a>
+          <button
+            type="button"
+            onClick={() => { setIsManualBilty(false); setManualBiltyNo(''); setBiltyNoError(''); }}
+            className="bma-btn-addnew"
+          >
+            Add New
+          </button>
         </div>
       </div>
 
       {/* ── BILTY FORM ── */}
-      <form onSubmit={handleSubmit} className="no-print">
-        {/* Removed redundant h1 title */}
+      <form onSubmit={handleSubmit} className="no-print bma-bilty-form">
 
-        {/* Route / Trip Details */}
-        <div className="card p-compact mb-compact">
-          <h2 className="text-xs font-bold border-b mb-2 pb-1 text-primary flex items-center gap-2">🗺️ Route & Trip Details</h2>
-          <div className="grid grid-cols-4 gap-4">
-            <div className="input-group">
-              <label className="input-label text-2xs flex items-center gap-1"><MapPin size={10} className="text-primary"/> From Booking</label>
-              <input required type="text" name="fromCity" value={formData.fromCity} onChange={handleInputChange} className="input text-sm p-2" style={{height: '32px'}} />
+        {/* Row 1: Bilty No, Type(From/To), Date, Vehicle(Order No), Driver Name, Mobile */}
+        <div className="bma-form-section">
+          <div className="bma-form-grid bma-grid-6">
+            {/* Bilty No */}
+            <div className="bma-field">
+              <label className="bma-label">Bilty No <span className="bma-req">*</span></label>
+              {isManualBilty ? (
+                <>
+                  <input
+                    type="number"
+                    value={manualBiltyNo}
+                    onChange={(e) => { setManualBiltyNo(e.target.value); setBiltyNoError(''); }}
+                    placeholder="Enter #"
+                    className="bma-input"
+                    style={{ borderColor: biltyNoError ? '#ef4444' : undefined }}
+                  />
+                  {biltyNoError && <div className="bma-field-error">{biltyNoError}</div>}
+                </>
+              ) : (
+                <div className="bma-input bma-input-readonly">#{nextBiltyNo}</div>
+              )}
+              <label className="bma-manual-toggle">
+                <input
+                  type="checkbox"
+                  checked={isManualBilty}
+                  onChange={(e) => { setIsManualBilty(e.target.checked); setBiltyNoError(''); setManualBiltyNo(''); }}
+                  style={{ accentColor: '#f97316', marginRight: '4px' }}
+                />
+                Manual
+              </label>
             </div>
-            <div className="input-group">
-              <label className="input-label text-2xs flex items-center gap-1"><MapPin size={10} className="text-primary"/> Destination</label>
-              <input required type="text" name="toCity" value={formData.toCity} onChange={handleInputChange} className="input text-sm p-2" style={{height: '32px'}} />
-            </div>
-            <div className="input-group">
-              <label className="input-label text-2xs flex items-center gap-1"><Calendar size={10} className="text-primary"/> Bilty Date</label>
-              <input required type="date" name="date" value={formData.date} onChange={handleInputChange} className="input text-sm p-2" style={{height: '32px'}} />
-            </div>
-            <div className="input-group">
-               <label className="input-label text-2xs flex items-center gap-1"><Hash size={10} className="text-primary"/> Order Number</label>
-               <input type="text" name="orderNumber" value={formData.orderNumber} onChange={handleInputChange} className="input text-sm p-2" style={{height: '32px'}} placeholder="Optional" />
-            </div>
-          </div>
-        </div>
 
-        {/* Sender & Receiver */}
-        <div className="grid grid-cols-2 gap-4 mb-compact">
-          <div className="card p-compact">
-            <h2 className="text-sm font-bold mb-3 border-b pb-1">📤 Sender</h2>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="input-group">
-                <label className="input-label text-xs">Name</label>
-                <input required type="text" name="senderName" value={formData.senderName} onChange={handleInputChange} className="input text-sm p-2" placeholder="Ali Traders" />
-              </div>
-              <div className="input-group">
-                <label className="input-label text-xs">Contact</label>
-                <input type="text" name="senderContact" value={formData.senderContact} onChange={handleInputChange} className="input text-sm p-2" placeholder="0321..." />
-              </div>
-            </div>
-          </div>
-          <div className="card p-compact">
-            <h2 className="text-sm font-bold mb-3 border-b pb-1">📥 Receiver</h2>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="input-group">
-                <label className="input-label text-xs">Name</label>
-                <input required type="text" name="receiverName" value={formData.receiverName} onChange={handleInputChange} className="input text-sm p-2" placeholder="Usman Ent." />
-              </div>
-              <div className="input-group">
-                <label className="input-label text-xs">Contact</label>
-                <input type="text" name="receiverContact" value={formData.receiverContact} onChange={handleInputChange} className="input text-sm p-2" placeholder="0333..." />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Goods */}
-        <div className="card p-compact mb-compact">
-          <div className="flex justify-between items-center mb-2 border-b pb-1">
-            <h2 className="text-sm font-bold">📦 Goods Details</h2>
-            <div className="flex gap-4">
-               <div className="input-group flex-row items-center gap-2">
-                 <label className="input-label text-xs">LCL #</label>
-                 <input type="text" name="lclNumber" value={formData.lclNumber} onChange={handleInputChange} className="input text-sm p-1" style={{width: '100px'}} />
-               </div>
-               <div className="input-group flex-row items-center gap-2">
-                 <label className="input-label text-xs">Container #</label>
-                 <input type="text" name="containerNumber" value={formData.containerNumber} onChange={handleInputChange} className="input text-sm p-1" style={{width: '120px'}} />
-               </div>
-               <button type="button" onClick={addItem} className="btn btn-outline" style={{ padding: '0.2rem 0.6rem', fontSize: '0.75rem' }}>
-                <Plus size={14} /> Add Item
-               </button>
-            </div>
-          </div>
-
-          <div className="table-wrapper mb-2">
-            <table>
-              <thead>
-                <tr>
-                  <th style={{padding: '0.4rem'}}>#</th>
-                  <th style={{padding: '0.4rem'}}>Description *</th>
-                  <th width="10%" style={{padding: '0.4rem'}}>Qty*</th>
-                  <th width="12%" style={{padding: '0.4rem'}}>Wt(KG)*</th>
-                  <th width="10%" style={{padding: '0.4rem'}}>CBM</th>
-                  <th width="15%" style={{padding: '0.4rem'}}>Amt*</th>
-                  <th style={{ width: '40px', padding: '0.4rem' }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr key={item.id}>
-                    <td className="text-muted font-bold" style={{padding: '0.3rem'}}>{index + 1}</td>
-                    <td style={{padding: '0.3rem'}}><input required type="text" className="input text-xs" spellCheck="false" placeholder="Bags" value={item.goodsBayan} onChange={(e) => handleItemChange(item.id, 'goodsBayan', e.target.value)} /></td>
-                    <td style={{padding: '0.3rem'}}><input required type="number" min="0" className="input text-xs" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} /></td>
-                    <td style={{padding: '0.3rem'}}><input required type="number" min="0" className="input text-xs" value={item.weight} onChange={(e) => handleItemChange(item.id, 'weight', e.target.value)} /></td>
-                    <td style={{padding: '0.3rem'}}>
-                        <input type="number" className="input text-xs" min="0" value={item.cbm} onChange={(e) => handleItemChange(item.id, 'cbm', e.target.value)} />
-                      </td>
-                    <td style={{padding: '0.3rem'}}><input required type="number" min="0" className="input text-xs" value={item.amount} onChange={(e) => handleItemChange(item.id, 'amount', e.target.value)} /></td>
-                    <td style={{padding: '0.3rem'}}>
-                      <button type="button" onClick={() => removeItem(item.id)} className="btn btn-danger" style={{ padding: '0.2rem', borderRadius: '50%' }} disabled={items.length === 1}>
-                        <Trash2 size={10} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="p-1.5 flex justify-end gap-6" style={{ backgroundColor: 'var(--primary-light)', borderRadius: 'var(--radius-md)' }}>
-            <div className="text-xs"><span className="text-muted font-medium">Total Qty:</span> <span className="font-bold text-primary">{totalQuantity}</span></div>
-            <div className="text-xs"><span className="text-muted font-medium">Total Weight:</span> <span className="font-bold text-primary">{totalWeight} KG</span></div>
-          </div>
-        </div>
-
-        {/* Karaya & Payment Section */}
-        <div className="card p-compact">
-          <h2 className="text-xs font-bold border-b mb-2 pb-1 text-primary flex items-center gap-2">💰 Payments & Additional Charges</h2>
-          
-          {/* Main Charges Row */}
-          <div className="grid grid-cols-6 gap-3 mb-3 items-end">
-            <div className="input-group">
-              <label className="input-label text-2xs">Local Fare</label>
-              <input type="number" className="input text-sm p-2" value={formData.localFare} onChange={(e) => setFormData({...formData, localFare: e.target.value})} placeholder="0" />
-            </div>
-            <div className="input-group">
-              <label className="input-label text-2xs">Loading</label>
-              <input type="number" name="loadingCharges" value={formData.loadingCharges} onChange={handleInputChange} className="input text-sm p-2" placeholder="0" />
-            </div>
-            <div className="input-group" style={{ gridColumn: 'span 2' }}>
-              <label className="input-label text-2xs">Ex. Name (Other Expense)</label>
-              <input type="text" name="otherExpenseName" value={formData.otherExpenseName} onChange={handleInputChange} className="input text-sm p-2" placeholder="Packaging" />
-            </div>
-            <div className="input-group">
-              <label className="input-label text-2xs">Ex. Amt</label>
-              <input type="number" name="otherExpenseAmount" value={formData.otherExpenseAmount} onChange={handleInputChange} className="input text-sm p-2" placeholder="0" />
-            </div>
-            <div className="input-group">
-               <label className="input-label font-bold text-primary text-2xs text-center">Total Amount</label>
-               <div className="input font-bold text-primary bg-blue-50 border-blue-200 flex items-center justify-center text-sm" style={{ height: '32px' }}>
-                Rs. {totalCharges.toLocaleString()}
-               </div>
-            </div>
-          </div>
-          
-          {/* Payment Mode & Save Row */}
-          <div className="flex gap-4 items-end bg-slate-50 p-2 rounded-md border border-slate-100">
-            <div className="input-group" style={{ flex: 1.5 }}>
-              <label className="input-label text-2xs">Payment Mode *</label>
-              <select className="input text-sm p-1" style={{ height: '32px' }} value={formData.paymentStatus} onChange={(e) => setFormData({...formData, paymentStatus: e.target.value})}>
+            {/* Type / Payment Mode */}
+            <div className="bma-field">
+              <label className="bma-label">Type <span className="bma-req">*</span></label>
+              <select
+                className="bma-input bma-select"
+                value={formData.paymentStatus}
+                onChange={(e) => setFormData({ ...formData, paymentStatus: e.target.value })}
+              >
+                <option value="">Select</option>
                 <option value="Advance Fare">Advance Fare</option>
                 <option value="To Pay">To Pay</option>
                 <option value="Credit / Party Ledger">Credit / Party Ledger</option>
               </select>
             </div>
-            {formData.paymentStatus === 'Credit / Party Ledger' && (
-              <div className="input-group" style={{ flex: 2 }}>
-                <label className="input-label text-2xs">Party Name</label>
-                <input required type="text" name="partyName" value={formData.partyName} onChange={handleInputChange} className="input text-sm p-1" style={{ height: '32px' }} placeholder="Enter Party Name" />
-              </div>
-            )}
-            <div style={{ flex: 1 }}>
-              <button type="submit" className="btn btn-primary shadow-md" disabled={loading} style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', width: '100%', height: '32px', background: 'linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%)' }}>
-                <Save size={14} /> {loading ? 'Saving...' : 'Save & Print'}
-              </button>
+
+            {/* Date */}
+            <div className="bma-field">
+              <label className="bma-label">Date <span className="bma-req">*</span></label>
+              <input
+                required
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+
+            {/* Vehicle / Order No */}
+            <div className="bma-field">
+              <label className="bma-label">Vehicle <span className="bma-req">*</span></label>
+              <input
+                type="text"
+                name="orderNumber"
+                value={formData.orderNumber}
+                onChange={handleInputChange}
+                className="bma-input"
+                placeholder=""
+              />
+            </div>
+
+            {/* Driver Name → From City */}
+            <div className="bma-field">
+              <label className="bma-label">Driver Name</label>
+              <input
+                required
+                type="text"
+                name="fromCity"
+                value={formData.fromCity}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+
+            {/* Mobile → LCL Number */}
+            <div className="bma-field">
+              <label className="bma-label">Mobile</label>
+              <input
+                type="text"
+                name="lclNumber"
+                value={formData.lclNumber}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
             </div>
           </div>
         </div>
+
+        {/* Row 2: Loading Points, Destination, Party, Broker Name */}
+        <div className="bma-form-section">
+          <div className="bma-form-grid bma-grid-4">
+            <div className="bma-field">
+              <label className="bma-label">Loading Points <span className="bma-req">*</span></label>
+              <input
+                required
+                type="text"
+                name="senderName"
+                value={formData.senderName}
+                onChange={handleInputChange}
+                className="bma-input"
+                placeholder=""
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Destination</label>
+              <input
+                required
+                type="text"
+                name="toCity"
+                value={formData.toCity}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Party</label>
+              <select
+                className="bma-input bma-select"
+                value={formData.partyName}
+                onChange={(e) => setFormData({ ...formData, partyName: e.target.value })}
+              >
+                <option value="">Select</option>
+                <option value={formData.partyName}>{formData.partyName}</option>
+              </select>
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Broker Name</label>
+              <select
+                className="bma-input bma-select"
+                value={formData.senderContact}
+                onChange={(e) => setFormData({ ...formData, senderContact: e.target.value })}
+              >
+                <option value="">Select</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 3: Freight, Vehicle Freight, Lolo Charges, Detention, Weight Charges, Advance */}
+        <div className="bma-form-section">
+          <div className="bma-form-grid bma-grid-6">
+            <div className="bma-field">
+              <label className="bma-label">Freight <span className="bma-req">*</span></label>
+              <input
+                required
+                type="number"
+                min="0"
+                className="bma-input"
+                value={items[0]?.amount || ''}
+                onChange={(e) => handleItemChange(items[0].id, 'amount', e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Vehicle Freight <span className="bma-req">*</span></label>
+              <input
+                required
+                type="number"
+                min="0"
+                name="localFare"
+                value={formData.localFare}
+                onChange={handleInputChange}
+                className="bma-input"
+                placeholder="0"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Lolo Charges</label>
+              <input
+                type="number"
+                min="0"
+                name="loadingCharges"
+                value={formData.loadingCharges}
+                onChange={handleInputChange}
+                className="bma-input"
+                placeholder="0"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Detention</label>
+              <input
+                type="number"
+                min="0"
+                name="otherExpenseAmount"
+                value={formData.otherExpenseAmount}
+                onChange={handleInputChange}
+                className="bma-input"
+                placeholder="0"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Weight Charges</label>
+              <input
+                type="number"
+                min="0"
+                className="bma-input"
+                value={items[0]?.weight || ''}
+                onChange={(e) => handleItemChange(items[0].id, 'weight', e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Advance</label>
+              <input
+                type="number"
+                min="0"
+                name="receiverContact"
+                value={formData.receiverContact}
+                onChange={handleInputChange}
+                className="bma-input"
+                placeholder="0"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Row 4: Total Freight, Munshiana, Commission, Shipping Line, Container No */}
+        <div className="bma-form-section">
+          <div className="bma-form-grid bma-grid-5">
+            <div className="bma-field">
+              <label className="bma-label">Total Freight</label>
+              <div className="bma-input bma-input-readonly">{totalCharges > 0 ? totalCharges.toLocaleString() : '0'}</div>
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Munshiana</label>
+              <input
+                type="number"
+                min="0"
+                name="otherExpenseName"
+                value={formData.otherExpenseName}
+                onChange={handleInputChange}
+                className="bma-input"
+                placeholder="0"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Commission</label>
+              <div className="bma-input bma-input-readonly">{0}</div>
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Shipping Line</label>
+              <select className="bma-input bma-select">
+                <option value="">Select</option>
+              </select>
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Container No</label>
+              <input
+                type="text"
+                name="containerNumber"
+                value={formData.containerNumber}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Row 5: Sender, Receiver, Qty, Weight, Product Detail */}
+        <div className="bma-form-section">
+          <div className="bma-form-grid bma-grid-5">
+            <div className="bma-field">
+              <label className="bma-label">Sender</label>
+              <input
+                type="text"
+                name="senderContact"
+                value={formData.senderContact}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Receiver</label>
+              <input
+                required
+                type="text"
+                name="receiverName"
+                value={formData.receiverName}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Qty</label>
+              <input
+                required
+                type="number"
+                min="0"
+                className="bma-input"
+                value={items[0]?.quantity || ''}
+                onChange={(e) => handleItemChange(items[0].id, 'quantity', e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Weight</label>
+              <div className="bma-input bma-input-readonly">{totalWeight > 0 ? totalWeight : '0'}</div>
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Product Detail</label>
+              <input
+                required
+                type="text"
+                className="bma-input"
+                value={items[0]?.goodsBayan || ''}
+                onChange={(e) => handleItemChange(items[0].id, 'goodsBayan', e.target.value)}
+                placeholder=""
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Additional items rows (if more than 1 item) */}
+        {items.length > 1 && (
+          <div className="bma-form-section">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span style={{ fontWeight: 600, fontSize: '0.82rem', color: '#374151' }}>Additional Items</span>
+            </div>
+            <div className="bma-table-wrap">
+              <table className="bma-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Weight (KG)</th>
+                    <th>CBM</th>
+                    <th>Amount</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.slice(1).map((item, index) => (
+                    <tr key={item.id}>
+                      <td>{index + 2}</td>
+                      <td><input required type="text" className="bma-input" value={item.goodsBayan} onChange={(e) => handleItemChange(item.id, 'goodsBayan', e.target.value)} /></td>
+                      <td><input required type="number" min="0" className="bma-input" value={item.quantity} onChange={(e) => handleItemChange(item.id, 'quantity', e.target.value)} /></td>
+                      <td><input required type="number" min="0" className="bma-input" value={item.weight} onChange={(e) => handleItemChange(item.id, 'weight', e.target.value)} /></td>
+                      <td><input type="number" min="0" className="bma-input" value={item.cbm} onChange={(e) => handleItemChange(item.id, 'cbm', e.target.value)} /></td>
+                      <td><input required type="number" min="0" className="bma-input" value={item.amount} onChange={(e) => handleItemChange(item.id, 'amount', e.target.value)} /></td>
+                      <td>
+                        <button type="button" onClick={() => removeItem(item.id)} style={{ background: '#fee2e2', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Trash2 size={12} color="#ef4444" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ── Action Buttons ── */}
+        <div className="bma-form-actions">
+          <button type="submit" className="bma-btn-save" disabled={loading}>
+            <Save size={15} /> {loading ? 'Saving...' : '✔ SAVE'}
+          </button>
+          <button type="button" onClick={addItem} className="bma-btn-addmore">
+            <Plus size={15} /> ADD MORE
+          </button>
+          <button type="button" onClick={handlePrint} className="bma-btn-print">
+            <Printer size={15} /> PRINT
+          </button>
+        </div>
+
       </form>
 
       {/* Hidden print target (only shows in print media) */}

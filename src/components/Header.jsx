@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, User, LogOut, Menu } from 'lucide-react';
+import { Bell, LogOut, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Header = ({ onMenuToggle }) => {
@@ -14,45 +14,48 @@ const Header = ({ onMenuToggle }) => {
     <header className="header">
       <div className="header-left">
         <button className="hamburger-btn" onClick={onMenuToggle} aria-label="Toggle menu">
-          <Menu size={22} />
+          <Menu size={22} color="#ffffff" />
         </button>
-        <div className="header-company-info">
-          <span className="header-company-name">Super Pak Data Goods Wale Transport Company</span>
-          <span className="header-company-contact">Gate No 1 New Truck Stand Hawksbay Karachi | 03002024433</span>
+        <div className="header-brand">
+          <div className="header-brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#f97316" />
+              <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <span className="header-brand-text">SPD TMS</span>
         </div>
       </div>
-      
+
       <div className="header-actions">
-        <div className="relative header-search" style={{ position: 'relative' }}>
-          <input 
-            type="text" 
-            placeholder="Search bilty, truck..." 
-            className="input"
-            style={{ paddingLeft: '2.5rem', width: '250px' }}
-          />
-          <Search size={16} className="text-muted" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }} />
+        <div className="header-bell-wrap">
+          <button className="header-bell-btn" aria-label="Notifications">
+            <Bell size={20} color="#ffffff" />
+          </button>
+          <span className="header-bell-badge">2</span>
         </div>
-        
-        <button className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '50%', border: 'none' }}>
-          <Bell size={18} className="text-muted" />
-        </button>
-        <button className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: '50%', border: 'none', backgroundColor: 'var(--primary-light)' }}>
-          <User size={18} style={{ color: 'var(--primary)' }} />
-        </button>
-        <button 
+
+        <div className="header-avatar-wrap">
+          <div className="header-avatar-circle">
+            <svg width="26" height="26" viewBox="0 0 40 40" fill="none">
+              <circle cx="20" cy="20" r="20" fill="#f0f0f0" />
+              <circle cx="20" cy="16" r="7" fill="#aaa" />
+              <ellipse cx="20" cy="34" rx="12" ry="8" fill="#aaa" />
+            </svg>
+          </div>
+          <div className="header-welcome">
+            <span className="header-welcome-text">Welcome,</span>
+            <span className="header-welcome-name">Admin</span>
+          </div>
+        </div>
+
+        <button
           onClick={handleLogout}
-          className="btn btn-outline" 
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '0.4rem', 
-            fontSize: '0.8rem', 
-            fontWeight: 700, 
-            color: '#ef4444',
-            borderColor: '#fee2e2'
-          }}
+          className="header-logout-btn"
+          title="Logout"
         >
-          <LogOut size={16} /> <span className="logout-text">Logout</span>
+          <LogOut size={16} color="#ffffff" />
+          <span className="logout-text">Logout</span>
         </button>
       </div>
     </header>
