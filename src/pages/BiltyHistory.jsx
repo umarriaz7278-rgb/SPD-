@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './BiltyHistory.css';
 import { supabase } from '../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, Package, Truck, Archive, CheckCircle2, 
   ChevronDown, ChevronUp, AlertTriangle, MapPin,
-  FileText, Loader2, Calendar, Filter
+  FileText, Loader2, Calendar, Filter, Trash2
 } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 15;
 
 const BiltyHistory = () => {
+  const navigate = useNavigate();
   const [bilties, setBilties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -220,6 +222,47 @@ const BiltyHistory = () => {
     return steps;
   };
 
+  const handleDeleteBilty = async (e, bilty) => {
+    e.stopPropagation();
+    if (!window.confirm(`Bilty #${bilty.bilty_no} ko DELETE karna chahte hain?\n\nYe bilty aur usse related tamam records (items, chalan, delivery logs, claims) hamesha ke liye delete ho jayenge.`)) return;
+    try {
+      // Delete related records first
+      await supabase.from('bilty_items').delete().eq('bilty_id', bilty.id);
+      await supabase.from('chalan_bilties').delete().eq('bilty_id', bilty.id);
+      await supabase.from('delivery_logs').delete().eq('bilty_id', bilty.id);
+      await supabase.from('claims').delete().eq('bilty_id', bilty.id);
+      await supabase.from('party_ledger').delete().eq('bilty_id', bilty.id);
+      // Delete the bilty itself
+      const { error } = await supabase.from('bilties').delete().eq('id', bilty.id);
+      if (error) throw error;
+      setBilties(prev => prev.filter(b => b.id !== bilty.id));
+      setTotalCount(prev => prev - 1);
+      if (expandedId === bilty.id) { setExpandedId(null); setExpandedData(null); }
+      fetchStats();
+    } catch (err) {
+      alert('Error deleting bilty: ' + err.message);
+    }
+  };
+
+  const handleWhatsApp = (e, bilty) => {
+    e.stopPropagation();
+    const msg =
+      `*SPD Bilty Details*\n` +
+      `-----------------------------\n` +
+      `Bilty No: #${bilty.bilty_no}\n` +
+      `Date: ${bilty.bilty_date ? new Date(bilty.bilty_date).toLocaleDateString() : '—'}\n` +
+      `Sender: ${bilty.sender_name || '—'} ${bilty.sender_phone ? '(' + bilty.sender_phone + ')' : ''}\n` +
+      `Receiver: ${bilty.receiver_name || '—'} ${bilty.receiver_phone ? '(' + bilty.receiver_phone + ')' : ''}\n` +
+      `Route: ${bilty.from_city || '—'} → ${bilty.to_city || '—'}\n` +
+      `Weight: ${bilty.total_weight} KG\n` +
+      `Amount: Rs ${Number(bilty.total_amount || 0).toLocaleString()}\n` +
+      `Payment: ${bilty.payment_status || '—'}\n` +
+      `Status: ${bilty.status || '—'}\n` +
+      `-----------------------------\n` +
+      `Super Pak Data Goods Transport`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
@@ -324,6 +367,7 @@ const BiltyHistory = () => {
           </div>
         ) : (
           <>
+            <div style={{ overflowX: 'auto', width: '100%' }}>
             <table>
               <thead>
                 <tr>
@@ -337,6 +381,7 @@ const BiltyHistory = () => {
                   <th>Amount</th>
                   <th>Payment</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -387,12 +432,38 @@ const BiltyHistory = () => {
                           {bilty.status}
                         </span>
                       </td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                          <button
+                            onClick={(e) => handleWhatsApp(e, bilty)}
+                            title="Share on WhatsApp"
+                            style={{ background: '#25D366', border: 'none', borderRadius: '7px', padding: '0.3rem 0.55rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#fff', fontWeight: 700, fontSize: '0.72rem', whiteSpace: 'nowrap' }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            WhatsApp
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate('/invoices?bilty_id=' + bilty.id); }}
+                            title="Create / View Invoice"
+                            style={{ background: '#1e40af', border: 'none', borderRadius: '7px', padding: '0.3rem 0.55rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#fff', fontWeight: 700, fontSize: '0.72rem', whiteSpace: 'nowrap' }}
+                          >
+                            <FileText size={13} /> Invoice
+                          </button>
+                          <button
+                            onClick={(e) => handleDeleteBilty(e, bilty)}
+                            title="Delete Bilty"
+                            style={{ background: '#fee2e2', border: 'none', borderRadius: '7px', padding: '0.3rem 0.55rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#dc2626', fontWeight: 700, fontSize: '0.72rem', whiteSpace: 'nowrap' }}
+                          >
+                            <Trash2 size={13} /> Delete
+                          </button>
+                        </div>
+                      </td>
                     </tr>
 
                     {/* Expanded Detail Row */}
                     {expandedId === bilty.id && (
                       <tr className="history-detail-row">
-                        <td colSpan="10">
+                        <td colSpan="11">
                           <div className="history-detail-content">
                             {loadingDetail ? (
                               <div className="history-loading" style={{ padding: '2rem' }}>
@@ -622,6 +693,8 @@ const BiltyHistory = () => {
                 ))}
               </tbody>
             </table>
+
+            </div> {/* end overflow-x scroll */}
 
             {/* Pagination */}
             <div className="history-pagination">

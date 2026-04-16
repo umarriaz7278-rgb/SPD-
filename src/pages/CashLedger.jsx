@@ -51,6 +51,26 @@ const CashLedger = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Auto transfer: detect ledger name in description and add income to that ledger
+  const autoTransferToLedger = async (description, amount, date, currentTable, currentName) => {
+    const d = description.toLowerCase();
+    const ledgers = [
+      { keywords: ['lahore cash ledger', 'lahore'], table: 'lahore_cash_ledger', descField: 'description' },
+      { keywords: ['cash ledger karachi', 'karachi'], table: 'cash_ledger', descField: 'source_description' },
+      { keywords: ['main owner cash ledger', 'main owner'], table: 'main_owner_cash_ledger', descField: 'description' },
+      { keywords: ['hammad cash ledger', 'hammad'], table: 'hammad_cash_ledger', descField: 'description' },
+    ];
+    const target = ledgers.find(l => l.table !== currentTable && l.keywords.some(k => d.includes(k)));
+    if (!target) return;
+    const insertObj = {
+      transaction_type: 'Income',
+      amount,
+      record_date: date,
+    };
+    insertObj[target.descField] = `Transfer from ${currentName} - ${description}`;
+    await supabase.from(target.table).insert(insertObj);
+  };
+
   const handleCreateTransaction = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -70,6 +90,12 @@ const CashLedger = () => {
       if (error) throw error;
       
       setTransactions([data, ...transactions]);
+
+      // Auto-transfer: if expense mentions another ledger, add income there
+      if (formType === 'Expense') {
+        await autoTransferToLedger(formData.source_description, Number(formData.amount), formData.date, 'cash_ledger', 'Cash Ledger Karachi');
+      }
+
       setShowForm(false);
       setFormData({ amount: '', source_description: '', ref_id: '', date: new Date().toISOString().split('T')[0] });
     } catch (err) {
