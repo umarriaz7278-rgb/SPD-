@@ -9,164 +9,163 @@ import { COMPANY } from '../lib/constants';
 // ──────────────────────────────────────────────
 const PrintBilty = ({ bilty, items }) => {
   const today = new Date().toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' });
+  const biltyDate = bilty.bilty_date
+    ? new Date(bilty.bilty_date).toLocaleDateString('en-PK', { day: '2-digit', month: 'short', year: 'numeric' })
+    : today;
+
+  const s = {
+    wrap: { fontFamily: "'Arial', sans-serif", color: '#1a1a2e', background: '#fff', border: '2px solid #1e3a8a', borderRadius: '6px', overflow: 'hidden', width: '100%' },
+    header: { background: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 60%, #2563eb 100%)', padding: '8px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+    logo: { width: '36px', height: '36px', background: '#fff', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+    logoText: { color: '#1e3a8a', fontWeight: 900, fontSize: '11px', letterSpacing: '0.5px' },
+    companyName: { color: '#fff', fontWeight: 900, fontSize: '13px', lineHeight: 1.1, letterSpacing: '0.3px' },
+    companySubtitle: { color: '#bfdbfe', fontWeight: 700, fontSize: '8px', marginTop: '1px' },
+    companyAddr: { color: '#93c5fd', fontSize: '7.5px', marginTop: '2px' },
+    contactBox: { textAlign: 'right', color: '#bfdbfe', fontSize: '7.5px', lineHeight: 1.6 },
+    strip: { background: '#fbbf24', padding: '4px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #1e3a8a' },
+    stripTitle: { fontWeight: 900, fontSize: '10px', color: '#1e3a8a' },
+    stripBiltyNo: { fontWeight: 900, fontSize: '16px', color: '#1e3a8a' },
+    stripDate: { fontWeight: 700, fontSize: '9px', color: '#1e3a8a' },
+    infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '2px solid #1e3a8a' },
+    infoCol: { padding: '6px 10px' },
+    infoColTitle: { fontWeight: 800, fontSize: '7.5px', color: '#fff', background: '#1e3a8a', display: 'inline-block', padding: '2px 7px', borderRadius: '3px', marginBottom: '4px', textTransform: 'uppercase' },
+    infoRow: { display: 'flex', gap: '4px', marginBottom: '2.5px', fontSize: '9px' },
+    infoKey: { fontWeight: 700, color: '#1e3a8a', minWidth: '88px', flexShrink: 0 },
+    infoVal: { fontWeight: 600, color: '#111' },
+    tbl: { width: '100%', borderCollapse: 'collapse', fontSize: '8.5px' },
+    th: { background: '#1e3a8a', color: '#fff', padding: '4px 7px', fontWeight: 700, textAlign: 'left' },
+    thR: { background: '#1e3a8a', color: '#fff', padding: '4px 7px', fontWeight: 700, textAlign: 'right' },
+    thC: { background: '#1e3a8a', color: '#fff', padding: '4px 7px', fontWeight: 700, textAlign: 'center' },
+    td: { padding: '3px 7px', borderBottom: '1px solid #e2e8f0', color: '#111' },
+    tdR: { padding: '3px 7px', borderBottom: '1px solid #e2e8f0', color: '#111', textAlign: 'right' },
+    tdC: { padding: '3px 7px', borderBottom: '1px solid #e2e8f0', color: '#111', textAlign: 'center' },
+    totalRow: { background: '#eff6ff' },
+    totalTd: { padding: '4px 7px', fontWeight: 900, color: '#1e3a8a', borderTop: '2px solid #1e3a8a' },
+    chargeGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', borderTop: '2px solid #1e3a8a' },
+    chargeCol: { padding: '6px 10px', borderRight: '2px solid #1e3a8a' },
+    chargeColR: { padding: '6px 10px' },
+    chargeTitle: { fontSize: '7.5px', fontWeight: 700, color: '#1e3a8a', textTransform: 'uppercase', marginBottom: '3px' },
+    chargeRow: { display: 'flex', justifyContent: 'space-between', fontSize: '8.5px', marginBottom: '2px' },
+    totalBox: { display: 'flex', justifyContent: 'space-between', padding: '4px 7px', background: '#1e40af', borderRadius: '4px', marginTop: '3px' },
+    totalLabel: { fontWeight: 800, color: '#fff', fontSize: '9px' },
+    totalAmt: { fontWeight: 900, color: '#fbbf24', fontSize: '11px' },
+    badge: { display: 'inline-block', background: '#fbbf24', padding: '3px 10px', borderRadius: '4px', fontWeight: 800, fontSize: '10px', color: '#1e3a8a' },
+    sigGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', padding: '6px 10px', gap: '10px', borderTop: '2px solid #1e3a8a' },
+    sigBox: { textAlign: 'center' },
+    sigLine: { borderTop: '1px solid #94a3b8', paddingTop: '3px', marginTop: '20px', fontSize: '7px', fontWeight: 600, color: '#64748b', textTransform: 'uppercase' },
+  };
 
   return (
-    <div className="bilty-print-area" style={{ border: '2px solid #1e3a8a' }}>
+    <div style={s.wrap}>
 
-      {/* Company Header Image - Only visible in print */}
-      <div className="print-urdu-header">
-        <img src="/bilty-header.jpg" alt="SPD Header" style={{ width: '100%', display: 'block' }} />
-      </div>
-
-      {/* English Company Header - hidden in print, shown on screen */}
-      <div className="print-company-header screen-only-header" style={{ padding: '1rem', textAlign: 'center', borderBottom: '3px solid #000', marginBottom: '10px' }}>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: 900, textTransform: 'uppercase', margin: 0, color: '#000', letterSpacing: '1px' }}>{COMPANY.name}</h1>
-        <p style={{ fontSize: '1rem', fontWeight: 700, margin: '0.4rem 0', color: '#333', textTransform: 'uppercase' }}>Goods Transport Service</p>
-        <div style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0.4rem 0', color: '#000' }}>
-          📍 {COMPANY.address}
+      {/* ── Company Header ── */}
+      <div style={s.header}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={s.logo}><span style={s.logoText}>SPD</span></div>
+          <div>
+            <div style={s.companyName}>SUPER PAK DATA GOODS WALE</div>
+            <div style={s.companySubtitle}>TRANSPORT COMPANY</div>
+            <div style={s.companyAddr}>Gate No 1, New Truck Stand, Hawksbay, Karachi</div>
+          </div>
         </div>
-        <div style={{ fontSize: '1.2rem', fontWeight: 900, margin: '0.4rem 0', color: '#000' }}>
-          📞 {COMPANY.phones}
-        </div>
-        <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#444' }}>
-          📧 {COMPANY.email} | 🌐 {COMPANY.website}
+        <div style={s.contactBox}>
+          <div style={{ color: '#fff', fontWeight: 800, fontSize: '8px' }}>Karachi: 0300-2024433 | 0321-2024433</div>
+          <div>0312-2024433 | 021-32351333</div>
+          <div style={{ color: '#93c5fd' }}>superpakdatawale@gmail.com</div>
+          <div style={{ color: '#93c5fd' }}>Lahore: Saggian Pull, Hazrat Ali Road</div>
         </div>
       </div>
 
-      {/* Bilty Number Strip */}
-      <div className="print-bilty-strip">
-        <span>BILTY / CONSIGNMENT NOTE</span>
-        <span>
-          Bilty No: <span className="print-bilty-no-big">#{bilty.bilty_no}</span>
-        </span>
-        <span>Date: {bilty.bilty_date || today}</span>
+      {/* ── Bilty Number Strip ── */}
+      <div style={s.strip}>
+        <span style={s.stripTitle}>BILTY / CONSIGNMENT NOTE</span>
+        <span style={s.stripBiltyNo}>#{bilty.bilty_no}</span>
+        <span style={s.stripDate}>Date: {biltyDate}</span>
       </div>
 
-      {/* Sender & Receiver Info */}
-      <div className="print-info-grid" style={{ borderBottom: '2px solid #1e3a8a' }}>
-        <div className="print-info-col">
-          <div className="print-info-col-title">📤 SENDER INFORMATION</div>
-          <div className="print-info-row">
-            <span className="print-info-key">Name:</span>
-            <span className="print-info-val">{bilty.sender_name}</span>
-          </div>
-          <div className="print-info-row">
-            <span className="print-info-key">Phone:</span>
-            <span className="print-info-val">{bilty.sender_phone || '—'}</span>
-          </div>
-          <div className="print-info-row">
-            <span className="print-info-key">From City:</span>
-            <span className="print-info-val">{bilty.route_from || bilty.from_city}</span>
-          </div>
+      {/* ── Sender & Receiver ── */}
+      <div style={s.infoGrid}>
+        <div style={{ ...s.infoCol, borderRight: '2px solid #1e3a8a' }}>
+          <div style={s.infoColTitle}>📤 Sender Information</div>
+          <div style={s.infoRow}><span style={s.infoKey}>Sender Name:</span><span style={s.infoVal}>{bilty.sender_phone || '—'}</span></div>
+          <div style={s.infoRow}><span style={s.infoKey}>Loading Points:</span><span style={s.infoVal}>{bilty.sender_name || '—'}</span></div>
+          <div style={s.infoRow}><span style={s.infoKey}>From:</span><span style={s.infoVal}>{bilty.from_city || bilty.route_from || '—'}</span></div>
+          {bilty.lcl_number && <div style={s.infoRow}><span style={s.infoKey}>Mobile:</span><span style={s.infoVal}>{bilty.lcl_number}</span></div>}
         </div>
-        <div className="print-info-col">
-          <div className="print-info-col-title">📥 RECEIVER INFORMATION</div>
-          <div className="print-info-row">
-            <span className="print-info-key">Name:</span>
-            <span className="print-info-val">{bilty.receiver_name}</span>
+        <div style={s.infoCol}>
+          <div style={s.infoColTitle}>📥 Receiver Information</div>
+          <div style={s.infoRow}><span style={s.infoKey}>Receiver Name:</span><span style={s.infoVal}>{bilty.receiver_name || '—'}</span></div>
+          <div style={s.infoRow}><span style={s.infoKey}>Destination:</span><span style={s.infoVal}>{bilty.to_city || bilty.route_to || '—'}</span></div>
+          {bilty.container_number && <div style={s.infoRow}><span style={s.infoKey}>Container No:</span><span style={s.infoVal}>{bilty.container_number}</span></div>}
+          <div style={s.infoRow}>
+            <span style={s.infoKey}>Payment Type:</span>
+            <span style={{ ...s.badge, fontSize: '8px', padding: '1px 6px' }}>{bilty.payment_status || '—'}</span>
           </div>
-          <div className="print-info-row">
-            <span className="print-info-key">Phone:</span>
-            <span className="print-info-val">{bilty.receiver_phone || '—'}</span>
-          </div>
-          <div className="print-info-row">
-            <span className="print-info-key">To City:</span>
-            <span className="print-info-val">{bilty.route_to || bilty.to_city}</span>
-          </div>
+          {bilty.party_name && <div style={s.infoRow}><span style={s.infoKey}>Party:</span><span style={s.infoVal}>{bilty.party_name}</span></div>}
         </div>
       </div>
 
-      {/* Order / LCL / Container Info */}
-      {(bilty.order_number || bilty.lcl_number || bilty.container_number) && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 1.25rem', borderBottom: '2px solid #1e3a8a', fontSize: '0.85rem' }}>
-          {bilty.order_number && (
-            <div><span style={{ fontWeight: 700, color: '#1e3a8a' }}>Order No: </span><span style={{ fontWeight: 600 }}>{bilty.order_number}</span></div>
-          )}
-          {bilty.lcl_number && (
-            <div><span style={{ fontWeight: 700, color: '#1e3a8a' }}>LCL No: </span><span style={{ fontWeight: 600 }}>{bilty.lcl_number}</span></div>
-          )}
-          {bilty.container_number && (
-            <div><span style={{ fontWeight: 700, color: '#1e3a8a' }}>Container No: </span><span style={{ fontWeight: 600 }}>{bilty.container_number}</span></div>
-          )}
-        </div>
-      )}
-
-      {/* Goods Table */}
-      <table className="print-goods-table">
+      {/* ── Goods Table ── */}
+      <table style={s.tbl}>
         <thead>
           <tr>
-            <th style={{ width: '30px' }}>#</th>
-            <th>Description of Goods</th>
-            <th style={{ textAlign: 'center' }}>Quantity</th>
-            <th style={{ textAlign: 'center' }}>Weight (KG)</th>
-            <th style={{ textAlign: 'center' }}>CBM</th>
-            <th style={{ textAlign: 'right' }}>Amount</th>
+            <th style={{ ...s.th, width: '22px' }}>#</th>
+            <th style={s.th}>Description of Goods</th>
+            <th style={s.thC}>Qty</th>
+            <th style={s.thC}>Weight KG</th>
+            <th style={s.thC}>CBM</th>
+            <th style={s.thR}>Amount (Rs)</th>
           </tr>
         </thead>
         <tbody>
           {items.map((item, i) => (
-            <tr key={i}>
-              <td>{i + 1}</td>
-              <td><strong>{item.goodsBayan || item.goods_bayan || item.item_name || ''}</strong></td>
-              <td style={{ textAlign: 'center' }}>{item.quantity}</td>
-              <td style={{ textAlign: 'center' }}>{item.weight}</td>
-              <td style={{ textAlign: 'center' }}>{item.cbm || item.additional_weight || '-'}</td>
-              <td style={{ textAlign: 'right' }}>Rs {Number(item.amount).toLocaleString()}</td>
+            <tr key={i} style={{ background: i % 2 === 0 ? '#fff' : '#f8fafc' }}>
+              <td style={s.td}>{i + 1}</td>
+              <td style={{ ...s.td, fontWeight: 700 }}>{item.goodsBayan || item.goods_bayan || item.item_name || '—'}</td>
+              <td style={s.tdC}>{item.quantity || '—'}</td>
+              <td style={s.tdC}>{item.weight || '—'}</td>
+              <td style={s.tdC}>{item.cbm || item.additional_weight || '—'}</td>
+              <td style={s.tdR}>Rs {Number(item.amount || 0).toLocaleString()}</td>
             </tr>
           ))}
-          {/* Totals Row */}
-          <tr className="print-totals-row">
-            <td></td>
-            <td><strong>GRAND TOTAL</strong></td>
-            <td style={{ textAlign: 'center' }}><strong>{bilty.total_quantity}</strong></td>
-            <td style={{ textAlign: 'center' }}><strong>{bilty.total_weight} KG</strong></td>
-            <td style={{ textAlign: 'center' }}>—</td>
-            <td style={{ textAlign: 'right' }}><strong>Rs {Number(bilty.total_amount).toLocaleString()}</strong></td>
+          <tr style={s.totalRow}>
+            <td style={s.totalTd}></td>
+            <td style={{ ...s.totalTd, fontWeight: 900 }}>GRAND TOTAL</td>
+            <td style={{ ...s.totalTd, textAlign: 'center' }}>{bilty.total_quantity}</td>
+            <td style={{ ...s.totalTd, textAlign: 'center' }}>{bilty.total_weight} KG</td>
+            <td style={{ ...s.totalTd, textAlign: 'center' }}>—</td>
+            <td style={{ ...s.totalTd, textAlign: 'right' }}>Rs {Number(bilty.total_amount || 0).toLocaleString()}</td>
           </tr>
         </tbody>
       </table>
 
-      {/* Payment Section */}
-      <div className="print-payment-section">
-        <div className="print-payment-block">
-          <div className="print-payment-title">💰 Karaya (Freight Charges)</div>
-          <div className="print-payment-value">Rs. {bilty.total_amount?.toLocaleString()}</div>
-          {bilty.other_expense_name && (
-            <div style={{ fontSize: '0.8rem', color: '#555', marginTop: '0.3rem' }}>
-              {bilty.other_expense_name}: Rs. {Number(bilty.other_expense_amount || 0).toLocaleString()}
-            </div>
-          )}
+      {/* ── Charges + Payment ── */}
+      <div style={s.chargeGrid}>
+        <div style={s.chargeCol}>
+          <div style={s.chargeTitle}>Freight / Karaya Charges</div>
+          <div style={s.chargeRow}><span>Freight (Karaya):</span><span style={{ fontWeight: 700 }}>Rs {Number(items.reduce((a, i) => a + Number(i.amount || 0), 0)).toLocaleString()}</span></div>
+          <div style={s.chargeRow}><span>Local Freight:</span><span style={{ fontWeight: 700 }}>Rs {Number(bilty.local_karaya || 0).toLocaleString()}</span></div>
+          {bilty.loading_charges > 0 && <div style={s.chargeRow}><span>Loading Charges:</span><span style={{ fontWeight: 700 }}>Rs {Number(bilty.loading_charges || 0).toLocaleString()}</span></div>}
+          {bilty.other_expense_name && <div style={s.chargeRow}><span>{bilty.other_expense_name}:</span><span style={{ fontWeight: 700 }}>Rs {Number(bilty.other_expense_amount || 0).toLocaleString()}</span></div>}
+          <div style={s.totalBox}><span style={s.totalLabel}>TOTAL FREIGHT</span><span style={s.totalAmt}>Rs {Number(bilty.total_amount || 0).toLocaleString()}</span></div>
         </div>
-        <div className="print-payment-block">
-          <div className="print-payment-title">💳 Payment Status / Tadaa</div>
-          <div style={{ marginTop: '0.35rem' }}>
-            <span className="print-payment-badge">{bilty.payment_status}</span>
-            {bilty.party_name && (
-              <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: '#555' }}>Party: {bilty.party_name}</span>
-            )}
+        <div style={s.chargeColR}>
+          <div style={s.chargeTitle}>Payment Status / Tadaa</div>
+          <div style={{ marginBottom: '3px' }}><span style={s.badge}>{bilty.payment_status || '—'}</span></div>
+          {bilty.party_name && <div style={{ fontSize: '8px', color: '#475569', marginTop: '2px' }}>Party: <strong>{bilty.party_name}</strong></div>}
+          {bilty.container_number && <div style={{ marginTop: '3px', ...s.chargeRow }}><span>Container No:</span><span style={{ fontWeight: 700 }}>{bilty.container_number}</span></div>}
+        </div>
+      </div>
+
+      {/* ── Signature Footer ── */}
+      <div style={s.sigGrid}>
+        {["Sender's Signature", "Driver / Auth. Signature", "Receiver's Signature"].map((label, i) => (
+          <div key={i} style={s.sigBox}>
+            <div style={s.sigLine}>{label}</div>
           </div>
-        </div>
+        ))}
       </div>
 
-      {/* Signature Footer */}
-      <div className="print-footer">
-        <div className="print-sign-box">
-          <div className="print-sign-line">Sender's Signature</div>
-        </div>
-        <div className="print-sign-box">
-          <div className="print-sign-line">Driver / Authorised Signature</div>
-        </div>
-        <div className="print-sign-box">
-          <div className="print-sign-line">Receiver's Signature</div>
-        </div>
-      </div>
-
-      {/* Terms */}
-      <div className="print-terms">
-        <span className="print-terms-title">Terms & Conditions: </span>
-        Goods transported at owner's risk. Company not liable for delay due to natural calamities / road closures. All disputes subject to Karachi jurisdiction.
-        This bilty is a legal consignment note. Please keep it safe for delivery verification.
-      </div>
     </div>
   );
 };
@@ -201,6 +200,8 @@ const BiltyCreate = () => {
     orderNumber: '',
     lclNumber: '',
     containerNumber: '',
+    lcNumber: '',
+    blNumber: '',
     otherExpenseName: '',
     otherExpenseAmount: '',
   });
@@ -392,7 +393,7 @@ const BiltyCreate = () => {
           fromCity: 'Karachi', toCity: 'Lahore', 
           date: new Date().toISOString().split('T')[0], 
           paymentStatus: 'Advance Fare', partyName: '', localFare: '', loadingCharges: '', 
-          orderNumber: '', lclNumber: '', containerNumber: '', 
+          orderNumber: '', lclNumber: '', containerNumber: '', lcNumber: '', blNumber: '',
           otherExpenseName: '', otherExpenseAmount: '' 
         });
         setItems([{ id: Date.now(), goodsBayan: '', quantity: '', weight: '', cbm: '', amount: '' }]);
@@ -662,9 +663,9 @@ Then refresh this page and try again.`);
           </div>
         </div>
 
-        {/* Row 4: Total Freight, Container No */}
+        {/* Row 4: Total Freight, Container No, LC Number, BL Number, Order Number */}
         <div className="bma-form-section">
-          <div className="bma-form-grid bma-grid-4">
+          <div className="bma-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr', gap: '1rem' }}>
             <div className="bma-field">
               <label className="bma-label">Total Freight</label>
               <div className="bma-input bma-input-readonly">{totalCharges > 0 ? totalCharges.toLocaleString() : '0'}</div>
@@ -675,6 +676,36 @@ Then refresh this page and try again.`);
                 type="text"
                 name="containerNumber"
                 value={formData.containerNumber}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">LC Number</label>
+              <input
+                type="text"
+                name="lcNumber"
+                value={formData.lcNumber}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">BL Number</label>
+              <input
+                type="text"
+                name="blNumber"
+                value={formData.blNumber}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Order Number</label>
+              <input
+                type="text"
+                name="orderNumber"
+                value={formData.orderNumber}
                 onChange={handleInputChange}
                 className="bma-input"
               />
