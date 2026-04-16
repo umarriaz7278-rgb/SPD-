@@ -456,9 +456,9 @@ Then refresh this page and try again.`);
       {/* ── BILTY FORM ── */}
       <form onSubmit={handleSubmit} className="no-print bma-bilty-form">
 
-        {/* Row 1: Bilty No, Type(From/To), Date, Vehicle(Order No), Driver Name, Mobile */}
+        {/* Row 1: Bilty No, Type, Date, Mobile */}
         <div className="bma-form-section">
-          <div className="bma-form-grid bma-grid-6">
+          <div className="bma-form-grid bma-grid-4">
             {/* Bilty No */}
             <div className="bma-field">
               <label className="bma-label">Bilty No <span className="bma-req">*</span></label>
@@ -516,32 +516,6 @@ Then refresh this page and try again.`);
               />
             </div>
 
-            {/* Vehicle / Order No */}
-            <div className="bma-field">
-              <label className="bma-label">Vehicle <span className="bma-req">*</span></label>
-              <input
-                type="text"
-                name="orderNumber"
-                value={formData.orderNumber}
-                onChange={handleInputChange}
-                className="bma-input"
-                placeholder=""
-              />
-            </div>
-
-            {/* Driver Name → From City */}
-            <div className="bma-field">
-              <label className="bma-label">Driver Name</label>
-              <input
-                required
-                type="text"
-                name="fromCity"
-                value={formData.fromCity}
-                onChange={handleInputChange}
-                className="bma-input"
-              />
-            </div>
-
             {/* Mobile → LCL Number */}
             <div className="bma-field">
               <label className="bma-label">Mobile</label>
@@ -556,9 +530,36 @@ Then refresh this page and try again.`);
           </div>
         </div>
 
-        {/* Row 2: Loading Points, Destination, Party, Broker Name */}
+        {/* Row 2: Sender Name, Receiver Name */}
         <div className="bma-form-section">
           <div className="bma-form-grid bma-grid-4">
+            <div className="bma-field">
+              <label className="bma-label">Sender Name</label>
+              <input
+                type="text"
+                name="senderContact"
+                value={formData.senderContact}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Receiver Name</label>
+              <input
+                required
+                type="text"
+                name="receiverName"
+                value={formData.receiverName}
+                onChange={handleInputChange}
+                className="bma-input"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Row 3: Loading Points, Destination, Qty, CBM, Description */}
+        <div className="bma-form-section">
+          <div className="bma-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 0.6fr 0.6fr 2fr', gap: '1rem' }}>
             <div className="bma-field">
               <label className="bma-label">Loading Points <span className="bma-req">*</span></label>
               <input
@@ -583,32 +584,45 @@ Then refresh this page and try again.`);
               />
             </div>
             <div className="bma-field">
-              <label className="bma-label">Party</label>
-              <select
-                className="bma-input bma-select"
-                value={formData.partyName}
-                onChange={(e) => setFormData({ ...formData, partyName: e.target.value })}
-              >
-                <option value="">Select</option>
-                <option value={formData.partyName}>{formData.partyName}</option>
-              </select>
+              <label className="bma-label">Qty</label>
+              <input
+                required
+                type="number"
+                min="0"
+                className="bma-input"
+                value={items[0]?.quantity || ''}
+                onChange={(e) => handleItemChange(items[0].id, 'quantity', e.target.value)}
+                placeholder="0"
+              />
             </div>
             <div className="bma-field">
-              <label className="bma-label">Broker Name</label>
-              <select
-                className="bma-input bma-select"
-                value={formData.senderContact}
-                onChange={(e) => setFormData({ ...formData, senderContact: e.target.value })}
-              >
-                <option value="">Select</option>
-              </select>
+              <label className="bma-label">CBM</label>
+              <input
+                type="number"
+                min="0"
+                className="bma-input"
+                value={items[0]?.cbm || ''}
+                onChange={(e) => handleItemChange(items[0].id, 'cbm', e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            <div className="bma-field">
+              <label className="bma-label">Description</label>
+              <input
+                required
+                type="text"
+                className="bma-input"
+                value={items[0]?.goodsBayan || ''}
+                onChange={(e) => handleItemChange(items[0].id, 'goodsBayan', e.target.value)}
+                placeholder=""
+              />
             </div>
           </div>
         </div>
 
-        {/* Row 3: Freight, Vehicle Freight, Lolo Charges, Detention, Weight Charges, Advance */}
+        {/* Row 3: Freight, Vehicle Freight, Weight Charges */}
         <div className="bma-form-section">
-          <div className="bma-form-grid bma-grid-6">
+          <div className="bma-form-grid bma-grid-4">
             <div className="bma-field">
               <label className="bma-label">Freight <span className="bma-req">*</span></label>
               <input
@@ -622,7 +636,7 @@ Then refresh this page and try again.`);
               />
             </div>
             <div className="bma-field">
-              <label className="bma-label">Vehicle Freight <span className="bma-req">*</span></label>
+              <label className="bma-label">Local Freight <span className="bma-req">*</span></label>
               <input
                 required
                 type="number"
@@ -635,31 +649,7 @@ Then refresh this page and try again.`);
               />
             </div>
             <div className="bma-field">
-              <label className="bma-label">Lolo Charges</label>
-              <input
-                type="number"
-                min="0"
-                name="loadingCharges"
-                value={formData.loadingCharges}
-                onChange={handleInputChange}
-                className="bma-input"
-                placeholder="0"
-              />
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Detention</label>
-              <input
-                type="number"
-                min="0"
-                name="otherExpenseAmount"
-                value={formData.otherExpenseAmount}
-                onChange={handleInputChange}
-                className="bma-input"
-                placeholder="0"
-              />
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Weight Charges</label>
+              <label className="bma-label">Weight KG</label>
               <input
                 type="number"
                 min="0"
@@ -669,49 +659,15 @@ Then refresh this page and try again.`);
                 placeholder="0"
               />
             </div>
-            <div className="bma-field">
-              <label className="bma-label">Advance</label>
-              <input
-                type="number"
-                min="0"
-                name="receiverContact"
-                value={formData.receiverContact}
-                onChange={handleInputChange}
-                className="bma-input"
-                placeholder="0"
-              />
-            </div>
           </div>
         </div>
 
-        {/* Row 4: Total Freight, Munshiana, Commission, Shipping Line, Container No */}
+        {/* Row 4: Total Freight, Container No */}
         <div className="bma-form-section">
-          <div className="bma-form-grid bma-grid-5">
+          <div className="bma-form-grid bma-grid-4">
             <div className="bma-field">
               <label className="bma-label">Total Freight</label>
               <div className="bma-input bma-input-readonly">{totalCharges > 0 ? totalCharges.toLocaleString() : '0'}</div>
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Munshiana</label>
-              <input
-                type="number"
-                min="0"
-                name="otherExpenseName"
-                value={formData.otherExpenseName}
-                onChange={handleInputChange}
-                className="bma-input"
-                placeholder="0"
-              />
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Commission</label>
-              <div className="bma-input bma-input-readonly">{0}</div>
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Shipping Line</label>
-              <select className="bma-input bma-select">
-                <option value="">Select</option>
-              </select>
             </div>
             <div className="bma-field">
               <label className="bma-label">Container No</label>
@@ -726,59 +682,7 @@ Then refresh this page and try again.`);
           </div>
         </div>
 
-        {/* Row 5: Sender, Receiver, Qty, Weight, Product Detail */}
-        <div className="bma-form-section">
-          <div className="bma-form-grid bma-grid-5">
-            <div className="bma-field">
-              <label className="bma-label">Sender</label>
-              <input
-                type="text"
-                name="senderContact"
-                value={formData.senderContact}
-                onChange={handleInputChange}
-                className="bma-input"
-              />
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Receiver</label>
-              <input
-                required
-                type="text"
-                name="receiverName"
-                value={formData.receiverName}
-                onChange={handleInputChange}
-                className="bma-input"
-              />
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Qty</label>
-              <input
-                required
-                type="number"
-                min="0"
-                className="bma-input"
-                value={items[0]?.quantity || ''}
-                onChange={(e) => handleItemChange(items[0].id, 'quantity', e.target.value)}
-                placeholder="0"
-              />
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Weight</label>
-              <div className="bma-input bma-input-readonly">{totalWeight > 0 ? totalWeight : '0'}</div>
-            </div>
-            <div className="bma-field">
-              <label className="bma-label">Product Detail</label>
-              <input
-                required
-                type="text"
-                className="bma-input"
-                value={items[0]?.goodsBayan || ''}
-                onChange={(e) => handleItemChange(items[0].id, 'goodsBayan', e.target.value)}
-                placeholder=""
-              />
-            </div>
-          </div>
-        </div>
+
 
         {/* Additional items rows (if more than 1 item) */}
         {items.length > 1 && (

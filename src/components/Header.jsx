@@ -23,7 +23,7 @@ const Header = ({ onMenuToggle }) => {
               <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" />
             </svg>
           </div>
-          <span className="header-brand-text">SPD TMS</span>
+          <span className="header-brand-text">SUPER PAK DATA GOODS</span>
         </div>
       </div>
 

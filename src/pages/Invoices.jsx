@@ -203,7 +203,7 @@ const Invoices = () => {
     ];
 
     return (
-      <div style={{ padding: '2rem', maxWidth: '860px', margin: '0 auto', fontFamily: "'Inter', sans-serif", color: 'var(--text-main)' }}>
+      <div style={{ padding: '0.75rem 1rem', fontFamily: "'Inter', sans-serif", color: 'var(--text-main)', height: '100%' }}>
         {/* Print-only styles */}
         <style>{`
           @media print {
@@ -229,40 +229,47 @@ const Invoices = () => {
         `}</style>
 
         {/* Header — hidden on print */}
-        <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.75rem' }}>
+        <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
           <button
             onClick={handleCloseInvoice}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-muted)', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem' }}
           >
-            <ArrowLeft size={16} /> Back to Invoices
+            <ArrowLeft size={14} /> Back
           </button>
-          <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FileText size={20} /> Invoice — Bilty #{inv.bilties?.bilty_no ?? inv.bilty_id}
+          <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <FileText size={16} /> Invoice — Bilty #{inv.bilties?.bilty_no ?? inv.bilty_id}
           </h2>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button
-              onClick={handleSaveInvoice}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.25rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--success)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
-            >
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button onClick={handleSaveInvoice} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.35rem 0.9rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--success)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}>
               💾 Save
             </button>
-            <button
-              onClick={handlePrintInvoice}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.25rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}
-            >
-              <Printer size={15} /> Print
+            <button onClick={handlePrintInvoice} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.35rem 0.9rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}>
+              <Printer size={13} /> Print
             </button>
+            {/* Payment Received */}
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => setShowPaymentMenu(prev => !prev)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', padding: '0.35rem 0.9rem', borderRadius: 'var(--radius-md)', border: 'none', background: '#7c3aed', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}>
+                <CreditCard size={13} /> Payment ▾
+              </button>
+              {showPaymentMenu && (
+                <div style={{ position: 'absolute', top: '110%', right: 0, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', boxShadow: 'var(--shadow-lg)', overflow: 'hidden', minWidth: '210px', zIndex: 50 }}>
+                  <button onClick={() => handlePaymentOption('lahore')} style={{ display: 'block', width: '100%', padding: '0.6rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', borderBottom: '1px solid var(--border)' }}>💵 Cash Received Lahore</button>
+                  <button onClick={() => handlePaymentOption('karachi')} style={{ display: 'block', width: '100%', padding: '0.6rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', borderBottom: '1px solid var(--border)' }}>💵 Cash Received Karachi</button>
+                  <button onClick={() => handlePaymentOption('party')} style={{ display: 'block', width: '100%', padding: '0.6rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', color: 'var(--primary)' }}>👤 Go to Party Accounts</button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Printable area */}
-        <div id="invoice-print-area" style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div id="invoice-print-area">
 
-        {/* ═══ PRINT HEADER — branded top section ═══ */}
+        {/* ═══ PRINT HEADER ═══ */}
         <div className="print-only" style={{ display: 'none', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #1e40af', paddingBottom: '6px', marginBottom: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '40px', height: '40px', background: '#1e40af', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff', fontWeight: 900, fontSize: '14px', letterSpacing: '2px' }}>SPD</span>
+              <span style={{ color: '#fff', fontWeight: 900, fontSize: '14px' }}>SPD</span>
             </div>
             <div>
               <div style={{ fontSize: '13px', fontWeight: 900, color: '#1e40af', lineHeight: 1.2 }}>Super Pak Data Goods Wale Transport Company</div>
@@ -270,220 +277,180 @@ const Invoices = () => {
             </div>
           </div>
           <div style={{ textAlign: 'right', fontSize: '8px', color: '#475569', lineHeight: 1.5 }}>
-            <div style={{ fontWeight: 700, color: '#1e40af', fontSize: '8.5px', marginBottom: '1px' }}>Karachi Office</div>
+            <div style={{ fontWeight: 700, color: '#1e40af', fontSize: '8.5px' }}>Karachi Office</div>
             <div>0300-2024433, 0321-2024433, 0312-2024433</div>
-            <div>0302-2314433, 021-32351333</div>
             <div>superpakdatawale@gmail.com | www.superpakdata.com</div>
           </div>
         </div>
 
-        {/* ═══ ON-SCREEN HEADER (visible in browser, hidden on print) ═══ */}
-        <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '3px solid var(--primary)', paddingBottom: '12px', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ width: '56px', height: '56px', background: 'var(--primary)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff', fontWeight: 900, fontSize: '18px', letterSpacing: '2px' }}>SPD</span>
+        {/* ═══ SCREEN HEADER ═══ */}
+        <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid var(--primary)', paddingBottom: '8px', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ color: '#fff', fontWeight: 900, fontSize: '14px' }}>SPD</span>
             </div>
             <div>
-              <div style={{ fontSize: '16px', fontWeight: 900, color: 'var(--primary)', lineHeight: 1.2 }}>Super Pak Data Goods Wale Transport Company</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>Gate No 1 New Truck Stand Hawksbay Karachi</div>
+              <div style={{ fontSize: '13px', fontWeight: 900, color: 'var(--primary)', lineHeight: 1.2 }}>Super Pak Data Goods Wale Transport Company</div>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '1px' }}>Gate No 1 New Truck Stand Hawksbay Karachi</div>
             </div>
           </div>
-          <div style={{ textAlign: 'right', fontSize: '10px', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-            <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '11px', marginBottom: '2px' }}>Karachi Office</div>
+          <div style={{ textAlign: 'right', fontSize: '9px', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+            <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '10px' }}>Karachi Office</div>
             <div>0300-2024433, 0321-2024433, 0312-2024433</div>
-            <div>0302-2314433, 021-32351333</div>
-            <div>superpakdatawale@gmail.com</div>
-            <div>www.superpakdata.com</div>
+            <div>superpakdatawale@gmail.com | www.superpakdata.com</div>
           </div>
         </div>
 
         {/* Invoice Title Bar */}
-        <div style={{ background: '#1e40af', color: '#fff', textAlign: 'center', padding: '5px 0', borderRadius: '4px', marginBottom: '8px', fontSize: '12px', fontWeight: 800, letterSpacing: '1px' }}>
+        <div style={{ background: '#1e40af', color: '#fff', textAlign: 'center', padding: '4px 0', borderRadius: '4px', marginBottom: '8px', fontSize: '11px', fontWeight: 800, letterSpacing: '1px' }}>
           INVOICE — BILTY #{inv.bilties?.bilty_no ?? inv.bilty_id}
         </div>
 
-        {/* ═══ INVOICE INFORMATION CARD ═══ */}
-        <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 14px', marginBottom: '8px', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ fontSize: '9px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Invoice Information</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 16px' }}>
-            {[
-              { label: 'Company Name', key: 'companyName', placeholder: 'Enter company name' },
-              { label: 'Description', key: 'description', placeholder: 'Enter description' },
-              { label: 'Clearing Agent Name', key: 'clearingAgentName', placeholder: 'Enter clearing agent name' },
-              { label: 'Container Number', key: 'containerNumber', placeholder: 'Enter container number' },
-              { label: 'LC Number', key: 'lcNumber', placeholder: 'Enter LC number' },
-              { label: 'BL Number', key: 'blNumber', placeholder: 'Enter BL number' },
-            ].map(({ label, key, placeholder }) => (
-              <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '4px', borderBottom: '1px solid #e2e8f0', paddingBottom: '3px' }}>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', minWidth: '110px' }}>{label}:</span>
-                <input
-                  type="text"
-                  placeholder={placeholder}
-                  value={invoiceFields[key]}
-                  onChange={(e) => setInvoiceFields(prev => ({ ...prev, [key]: e.target.value }))}
-                  style={{ flex: 1, padding: '3px 6px', borderRadius: '4px', border: '1px solid var(--border)', fontSize: '11px', fontWeight: 600, background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* ═══ 2-COLUMN MAIN GRID ═══ */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
 
-        {/* ═══ DELIVERY DETAILS CARD ═══ */}
-        <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 14px', marginBottom: '8px', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ fontSize: '9px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Delivery Details</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0' }}>
-            {[
-              ['Bilty Number', `#${inv.bilties?.bilty_no ?? inv.bilty_id}`],
-              ['Delivery Date', inv.delivery_date ? new Date(inv.delivery_date).toLocaleDateString() : '—'],
-              ['Sender', inv.bilties?.sender_name || '—'],
-              ['Sender Phone', inv.bilties?.sender_phone || '—'],
-              ['Receiver Name', inv.receiver_name || '—'],
-              ['Receiver Mobile', inv.receiver_phone || '—'],
-              ['Receiver CNIC', inv.receiver_cnic || '—'],
-              ['Quantity Delivered', inv.delivered_quantity],
-              ['From', inv.bilties?.from_city || '—'],
-              ['To', inv.bilties?.to_city || '—'],
-              ['Payment Status', null],
-            ].map(([label, value], i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 8px', borderBottom: '1px solid #e2e8f0', background: i % 2 === 0 ? 'transparent' : '#f8fafc' }}>
-                <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>{label}</span>
-                {label === 'Payment Status' ? (
-                  <span style={styles.badge(inv.bilties?.payment_status)}>{inv.bilties?.payment_status || '—'}</span>
-                ) : (
-                  <span style={{ fontSize: '10px', fontWeight: 700, color: '#1a1a1a' }}>{value}</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ═══ FREIGHT & CHARGES TABLE ═══ */}
-        <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 14px', marginBottom: '8px', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ fontSize: '9px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Freight & Additional Charges</h3>
-
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: '#1e40af' }}>
-                <th style={{ padding: '4px 8px', fontSize: '9px', fontWeight: 700, color: '#fff', textTransform: 'uppercase', textAlign: 'left', letterSpacing: '0.04em' }}>Description</th>
-                <th style={{ padding: '4px 8px', fontSize: '9px', fontWeight: 700, color: '#fff', textTransform: 'uppercase', textAlign: 'right', letterSpacing: '0.04em', width: '180px' }}>Amount (Rs)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Freight base row */}
-              <tr style={{ background: '#eff6ff' }}>
-                <td style={{ padding: '3px 8px', fontSize: '10px', fontWeight: 700, borderBottom: '1px solid #e2e8f0', color: '#1e40af' }}>Freight (Base Cost)</td>
-                <td style={{ padding: '3px 8px', fontSize: '10px', fontWeight: 800, borderBottom: '1px solid #e2e8f0', textAlign: 'right', color: '#1e40af' }}>Rs {freight.toLocaleString()}</td>
-              </tr>
-              {chargeRows.map(({ label, key }, idx) => (
-                <tr key={key} style={{ background: idx % 2 === 0 ? 'transparent' : '#f8fafc' }}>
-                  <td style={{ padding: '3px 8px', fontSize: '10px', borderBottom: '1px solid #e2e8f0' }}>{label}</td>
-                  <td style={{ padding: '2px 8px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>
-                    <input
-                      type="number"
-                      min="0"
-                      placeholder="0"
-                      value={charges[key]}
-                      onChange={(e) => setCharges(prev => ({ ...prev, [key]: e.target.value }))}
-                      style={{ width: '120px', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)', fontSize: '10px', fontWeight: 600, textAlign: 'right', background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
-                    />
-                  </td>
-                </tr>
+          {/* LEFT: Invoice Information */}
+          <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '8px 10px', boxShadow: 'var(--shadow-md)' }}>
+            <h3 style={{ fontSize: '8px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '5px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Invoice Information</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              {[
+                { label: 'Company Name', key: 'companyName', placeholder: 'Enter company name' },
+                { label: 'Description', key: 'description', placeholder: 'Enter description' },
+                { label: 'Clearing Agent', key: 'clearingAgentName', placeholder: 'Clearing agent name' },
+                { label: 'Container No', key: 'containerNumber', placeholder: 'Container number' },
+                { label: 'LC Number', key: 'lcNumber', placeholder: 'LC number' },
+                { label: 'BL Number', key: 'blNumber', placeholder: 'BL number' },
+              ].map(({ label, key, placeholder }) => (
+                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '4px', borderBottom: '1px solid #e2e8f0', paddingBottom: '2px' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 700, color: '#64748b', minWidth: '80px' }}>{label}:</span>
+                  <input
+                    type="text"
+                    placeholder={placeholder}
+                    value={invoiceFields[key]}
+                    onChange={(e) => setInvoiceFields(prev => ({ ...prev, [key]: e.target.value }))}
+                    style={{ flex: 1, padding: '2px 4px', borderRadius: '3px', border: '1px solid var(--border)', fontSize: '9px', fontWeight: 600, background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
+                  />
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </div>
 
-        {/* ═══ CALCULATIONS CARD ═══ */}
-        <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '10px 14px', marginBottom: '8px', boxShadow: 'var(--shadow-md)' }}>
-          <h3 style={{ fontSize: '9px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Calculations</h3>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 8px', borderBottom: '1px solid #e2e8f0' }}>
-              <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>Gross Amount Without Tax</span>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: '#1a1a1a' }}>Rs {grossWithoutTax.toLocaleString()}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 8px', borderBottom: '1px solid #e2e8f0' }}>
-              <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>Tax (%)</span>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                placeholder="0"
-                value={taxPercent}
-                onChange={(e) => setTaxPercent(e.target.value)}
-                style={{ width: '80px', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)', fontSize: '10px', fontWeight: 600, textAlign: 'right', background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
-              />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 8px', borderBottom: '1px solid #e2e8f0' }}>
-              <span style={{ fontSize: '10px', fontWeight: 600, color: '#64748b' }}>Tax Amount</span>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#d97706' }}>Rs {taxAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', marginTop: '4px', background: '#1e40af', borderRadius: '4px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff' }}>Total Amount</span>
-              <span style={{ fontSize: '14px', fontWeight: 900, color: '#fff' }}>Rs {totalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+          {/* RIGHT: Delivery Details */}
+          <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '8px 10px', boxShadow: 'var(--shadow-md)' }}>
+            <h3 style={{ fontSize: '8px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '5px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Delivery Details</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {[
+                ['Bilty No', `#${inv.bilties?.bilty_no ?? inv.bilty_id}`],
+                ['Delivery Date', inv.delivery_date ? new Date(inv.delivery_date).toLocaleDateString() : '—'],
+                ['Sender', inv.bilties?.sender_name || '—'],
+                ['Sender Phone', inv.bilties?.sender_phone || '—'],
+                ['Receiver', inv.receiver_name || '—'],
+                ['Receiver Mobile', inv.receiver_phone || '—'],
+                ['Receiver CNIC', inv.receiver_cnic || '—'],
+                ['Qty Delivered', inv.delivered_quantity],
+                ['From', inv.bilties?.from_city || '—'],
+                ['To', inv.bilties?.to_city || '—'],
+                ['Payment', null],
+              ].map(([label, value], i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2px 4px', borderBottom: '1px solid #e2e8f0', background: i % 2 === 0 ? 'transparent' : '#f8fafc' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 600, color: '#64748b' }}>{label}</span>
+                  {label === 'Payment' ? (
+                    <span style={styles.badge(inv.bilties?.payment_status)}>{inv.bilties?.payment_status || '—'}</span>
+                  ) : (
+                    <span style={{ fontSize: '9px', fontWeight: 700, color: '#1a1a1a' }}>{value}</span>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* ═══ FOOTER — Lahore Office & Signature ═══ */}
-        <div style={{ marginTop: '10px', borderTop: '2px solid #1e40af', paddingTop: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            {/* Lahore Office */}
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '8px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', marginBottom: '2px' }}>Lahore Office</div>
-              <div style={{ fontSize: '8px', color: '#475569', lineHeight: 1.4 }}>
-                Super Pak Data Wale Goods Transport Co.<br />
-                Saggian Pull, Hazrat Ali Road, Lahore
+        {/* ═══ 2-COLUMN: Charges + Calculations ═══ */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+
+          {/* LEFT: Freight & Charges */}
+          <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '8px 10px', boxShadow: 'var(--shadow-md)' }}>
+            <h3 style={{ fontSize: '8px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '5px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Freight & Additional Charges</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: '#1e40af' }}>
+                  <th style={{ padding: '3px 6px', fontSize: '8px', fontWeight: 700, color: '#fff', textAlign: 'left' }}>Description</th>
+                  <th style={{ padding: '3px 6px', fontSize: '8px', fontWeight: 700, color: '#fff', textAlign: 'right', width: '110px' }}>Amount (Rs)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ background: '#eff6ff' }}>
+                  <td style={{ padding: '2px 6px', fontSize: '9px', fontWeight: 700, borderBottom: '1px solid #e2e8f0', color: '#1e40af' }}>Freight (Base)</td>
+                  <td style={{ padding: '2px 6px', fontSize: '9px', fontWeight: 800, borderBottom: '1px solid #e2e8f0', textAlign: 'right', color: '#1e40af' }}>Rs {freight.toLocaleString()}</td>
+                </tr>
+                {chargeRows.map(({ label, key }, idx) => (
+                  <tr key={key} style={{ background: idx % 2 === 0 ? 'transparent' : '#f8fafc' }}>
+                    <td style={{ padding: '2px 6px', fontSize: '9px', borderBottom: '1px solid #e2e8f0' }}>{label}</td>
+                    <td style={{ padding: '2px 6px', borderBottom: '1px solid #e2e8f0', textAlign: 'right' }}>
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        value={charges[key]}
+                        onChange={(e) => setCharges(prev => ({ ...prev, [key]: e.target.value }))}
+                        style={{ width: '90px', padding: '1px 4px', borderRadius: '3px', border: '1px solid var(--border)', fontSize: '9px', fontWeight: 600, textAlign: 'right', background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* RIGHT: Calculations + Footer */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="invoice-section" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '6px', padding: '8px 10px', boxShadow: 'var(--shadow-md)' }}>
+              <h3 style={{ fontSize: '8px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '5px', borderBottom: '2px solid #1e40af', paddingBottom: '2px', display: 'inline-block' }}>Calculations</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 4px', borderBottom: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 600, color: '#64748b' }}>Gross (Without Tax)</span>
+                  <span style={{ fontSize: '10px', fontWeight: 800 }}>Rs {grossWithoutTax.toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 4px', borderBottom: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 600, color: '#64748b' }}>Tax (%)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder="0"
+                    value={taxPercent}
+                    onChange={(e) => setTaxPercent(e.target.value)}
+                    style={{ width: '70px', padding: '1px 4px', borderRadius: '3px', border: '1px solid var(--border)', fontSize: '9px', fontWeight: 600, textAlign: 'right', background: 'var(--background)', color: 'var(--text-main)', outline: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '3px 4px', borderBottom: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 600, color: '#64748b' }}>Tax Amount</span>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: '#d97706' }}>Rs {taxAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 8px', marginTop: '4px', background: '#1e40af', borderRadius: '4px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#fff' }}>Total Amount</span>
+                  <span style={{ fontSize: '13px', fontWeight: 900, color: '#fff' }}>Rs {totalAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                </div>
               </div>
             </div>
-            {/* Signature Box */}
-            <div style={{ width: '180px', textAlign: 'center' }}>
-              <div style={{ borderBottom: '2px solid #1a1a1a', height: '36px', marginBottom: '4px' }}></div>
-              <div style={{ fontSize: '8px', fontWeight: 700, color: '#475569' }}>Authorized Signature & Stamp</div>
+
+            {/* Footer / Signature */}
+            <div style={{ borderTop: '2px solid #1e40af', paddingTop: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div>
+                  <div style={{ fontSize: '8px', fontWeight: 800, color: '#1e40af', textTransform: 'uppercase', marginBottom: '2px' }}>Lahore Office</div>
+                  <div style={{ fontSize: '8px', color: '#475569', lineHeight: 1.4 }}>Super Pak Data Wale Goods Transport Co.<br />Saggian Pull, Hazrat Ali Road, Lahore</div>
+                </div>
+                <div style={{ width: '140px', textAlign: 'center' }}>
+                  <div style={{ borderBottom: '2px solid #1a1a1a', height: '28px', marginBottom: '3px' }}></div>
+                  <div style={{ fontSize: '8px', fontWeight: 700, color: '#475569' }}>Authorized Signature</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         </div> {/* end invoice-print-area */}
-
-        {/* Save, Print & Payment buttons at bottom — hidden on print */}
-        <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-          <button
-            onClick={handleSaveInvoice}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.75rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--success)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
-          >
-            💾 Save Invoice
-          </button>
-          <button
-            onClick={handlePrintInvoice}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.75rem', borderRadius: 'var(--radius-md)', border: 'none', background: 'var(--primary)', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
-          >
-            <Printer size={16} /> Print Invoice
-          </button>
-          {/* Payment Received */}
-          <div style={{ position: 'relative' }}>
-            <button
-              onClick={() => setShowPaymentMenu(prev => !prev)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.65rem 1.75rem', borderRadius: 'var(--radius-md)', border: 'none', background: '#7c3aed', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
-            >
-              <CreditCard size={16} /> Payment Received ▾
-            </button>
-            {showPaymentMenu && (
-              <div style={{ position: 'absolute', bottom: '110%', right: 0, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '10px', boxShadow: 'var(--shadow-lg)', overflow: 'hidden', minWidth: '220px', zIndex: 50 }}>
-                <button onClick={() => handlePaymentOption('lahore')} style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', borderBottom: '1px solid var(--border)' }}>
-                  💵 Cash Received Lahore
-                </button>
-                <button onClick={() => handlePaymentOption('karachi')} style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', borderBottom: '1px solid var(--border)' }}>
-                  💵 Cash Received Karachi
-                </button>
-                <button onClick={() => handlePaymentOption('party')} style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', textAlign: 'left', background: 'transparent', border: 'none', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', color: 'var(--primary)' }}>
-                  👤 Go to Party Accounts
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Cash Payment Modal */}
         {showCashModal && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>

@@ -103,7 +103,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </svg>
         </div>
         <div>
-          <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#ffffff', lineHeight: 1.2 }}>SPD TMS</div>
+          <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#ffffff', lineHeight: 1.2 }}>SUPER PAK DATA GOODS</div>
           <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.55)', fontWeight: 600, letterSpacing: '0.06em', marginTop: '2px' }}>TRANSPORT SYSTEM</div>
         </div>
       </div>

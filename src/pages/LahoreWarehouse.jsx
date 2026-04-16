@@ -247,42 +247,48 @@ const LahoreWarehouse = () => {
 
       {/* DELIVERY MODAL */}
       {showDeliveryModal && selectedBilty && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
-          <div className="card animate-scale-up" style={{ width: '100%', maxWidth: '500px', margin: '1rem', boxShadow: 'var(--shadow-lg)', borderRadius: '16px' }}>
-            <h2 className="text-xl font-bold mb-4 border-b pb-3 flex items-center gap-2 text-main">
-              <UserCheck className="text-success" /> Handover Goods
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.5)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)', padding: '1rem', paddingTop: '4rem', overflowY: 'auto' }}>
+          <div className="card animate-scale-up" style={{ width: '100%', maxWidth: '480px', boxShadow: 'var(--shadow-lg)', borderRadius: '14px', padding: '1rem' }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '0.6rem', paddingBottom: '0.6rem', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <UserCheck size={18} style={{ color: 'var(--success)' }} /> Handover Goods
             </h2>
-            <div className="mb-6 bg-primary-light p-4 rounded-xl border border-blue-100">
-              <div className="flex justify-between font-bold text-primary mb-1 text-lg">
+            <div style={{ marginBottom: '0.7rem', background: 'var(--primary-light, #eff6ff)', padding: '0.6rem 0.8rem', borderRadius: '10px', border: '1px solid #bfdbfe' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, color: 'var(--primary)', fontSize: '0.95rem' }}>
                 <span>Bilty #{selectedBilty.bilty_no}</span>
                 <span>Available: {selectedBilty.lahore_quantity}</span>
               </div>
-              <div className="text-sm text-muted">Freight: <strong style={{color: 'var(--primary)'}}>Rs. {selectedBilty.total_amount}</strong> ({selectedBilty.payment_status})</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--muted, #6b7280)', marginTop: '0.2rem' }}>
+                Freight: <strong style={{ color: 'var(--primary)' }}>Rs. {selectedBilty.total_amount}</strong> ({selectedBilty.payment_status})
+              </div>
             </div>
 
-            <form onSubmit={handleDeliverySubmit} className="flex flex-col gap-4">
-              <div className="input-group">
-                <label className="input-label">Receiver Name</label>
-                <input required type="text" className="input" value={deliveryData.receiverName} onChange={(e) => setDeliveryData({...deliveryData, receiverName: e.target.value})} />
+            <form onSubmit={handleDeliverySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 600, display: 'block', marginBottom: '0.2rem' }}>Receiver Name</label>
+                  <input required type="text" className="input" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem' }} value={deliveryData.receiverName} onChange={(e) => setDeliveryData({...deliveryData, receiverName: e.target.value})} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 600, display: 'block', marginBottom: '0.2rem' }}>Mobile Number</label>
+                  <input required type="text" className="input" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem' }} value={deliveryData.receiverPhone} onChange={(e) => setDeliveryData({...deliveryData, receiverPhone: e.target.value})} />
+                </div>
               </div>
-              <div className="input-group">
-                <label className="input-label">Mobile Number</label>
-                <input required type="text" className="input" value={deliveryData.receiverPhone} onChange={(e) => setDeliveryData({...deliveryData, receiverPhone: e.target.value})} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 600, display: 'block', marginBottom: '0.2rem' }}>CNIC Number</label>
+                  <input required type="text" className="input" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem' }} placeholder="XXXXX-XXXXXXX-X" value={deliveryData.receiverCnic} onChange={(e) => setDeliveryData({...deliveryData, receiverCnic: e.target.value})} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.2rem', color: 'var(--primary)' }}>Quantity to Deliver</label>
+                  <input required type="number" min="1" max={selectedBilty.lahore_quantity} className="input" style={{ padding: '0.4rem 0.6rem', fontSize: '0.85rem', fontWeight: 700 }} value={deliveryData.deliveryQty} onChange={(e) => setDeliveryData({...deliveryData, deliveryQty: e.target.value})} />
+                </div>
               </div>
-              <div className="input-group">
-                <label className="input-label">CNIC Number</label>
-                <input required type="text" className="input" placeholder="XXXXX-XXXXXXX-X" value={deliveryData.receiverCnic} onChange={(e) => setDeliveryData({...deliveryData, receiverCnic: e.target.value})} />
-              </div>
-               <div className="input-group">
-                <label className="input-label text-primary font-bold">Quantity to Deliver</label>
-                <input required type="number" min="1" max={selectedBilty.lahore_quantity} className="input text-lg font-bold" value={deliveryData.deliveryQty} onChange={(e) => setDeliveryData({...deliveryData, deliveryQty: e.target.value})} />
-                <div className="text-xs text-muted mt-1">If partial delivery, the rest will remain in Lahore Warehouse.</div>
-              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--muted, #6b7280)', marginTop: '0.1rem' }}>* Partial delivery: remaining qty stays in Lahore Warehouse.</div>
 
-              <div className="flex justify-end gap-3 mt-4 pt-4 border-t">
-                <button type="button" className="btn btn-outline" onClick={() => setShowDeliveryModal(false)}>Cancel</button>
-                <button type="submit" className="btn text-white" style={{ background: 'var(--success)' }} disabled={saving}>
-                  {saving ? <Loader2 size={16} className="animate-spin" /> : <UserCheck size={16} />} 
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.6rem', paddingTop: '0.6rem', borderTop: '1px solid #e5e7eb' }}>
+                <button type="button" className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }} onClick={() => setShowDeliveryModal(false)}>Cancel</button>
+                <button type="submit" className="btn text-white" style={{ background: 'var(--success)', padding: '0.4rem 1rem', fontSize: '0.85rem' }} disabled={saving}>
+                  {saving ? <Loader2 size={15} className="animate-spin" /> : <UserCheck size={15} />}
                   {saving ? 'Processing...' : 'Confirm Delivery'}
                 </button>
               </div>
