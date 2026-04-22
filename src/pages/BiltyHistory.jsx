@@ -74,11 +74,11 @@ const BiltyHistory = () => {
       }
       if (searchTerm.trim()) {
         const term = searchTerm.trim();
-        // If it's a number, search bilty_no, otherwise search names
+        // If it's a number, search bilty_no exactly OR bl_number contains it
         if (!isNaN(term)) {
-          query = query.eq('bilty_no', Number(term));
+          query = query.or(`bilty_no.eq.${Number(term)},bl_number.ilike.%${term}%`);
         } else {
-          query = query.or(`sender_name.ilike.%${term}%,receiver_name.ilike.%${term}%`);
+          query = query.or(`sender_name.ilike.%${term}%,receiver_name.ilike.%${term}%,bl_number.ilike.%${term}%`);
         }
       }
 
@@ -321,7 +321,7 @@ const BiltyHistory = () => {
           <Search size={16} className="search-icon" />
           <input
             type="text"
-            placeholder="Search by Bilty Number, Sender, or Receiver..."
+            placeholder="Search by Bilty Number, BL Number, Sender, or Receiver..."
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
           />
@@ -373,6 +373,7 @@ const BiltyHistory = () => {
                 <tr>
                   <th style={{ width: 40 }}></th>
                   <th>Bilty #</th>
+                  <th>BL #</th>
                   <th>Date</th>
                   <th>Sender</th>
                   <th>Receiver</th>
@@ -395,6 +396,7 @@ const BiltyHistory = () => {
                         {expandedId === bilty.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                       </td>
                       <td className="bilty-no-cell">#{bilty.bilty_no}</td>
+                      <td style={{ fontSize: '0.78rem', color: '#374151' }}>{bilty.bl_number || '—'}</td>
                       <td>{bilty.bilty_date ? new Date(bilty.bilty_date).toLocaleDateString() : '—'}</td>
                       <td>
                         <div style={{ fontWeight: 600 }}>{bilty.sender_name}</div>

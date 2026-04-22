@@ -318,6 +318,7 @@ const BiltyCreate = () => {
         order_number: formData.orderNumber || null,
         lcl_number: formData.lclNumber || null,
         container_number: formData.containerNumber || null,
+        bl_number: formData.blNumber || null,
         other_expense_name: formData.otherExpenseName || null,
         other_expense_amount: Number(formData.otherExpenseAmount || 0),
         total_quantity: Number(totalQuantity || 0),
