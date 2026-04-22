@@ -562,7 +562,7 @@ const BiltyHistory = () => {
                                         <tbody>
                                           {expandedData.items.map((item, i) => (
                                             <tr key={i}>
-                                              <td>{item.goods_bayan || '—'}</td>
+                                              <td>{item.item_name || item.goods_bayan || '—'}</td>
                                               <td>{item.quantity}</td>
                                               <td>{item.weight} KG</td>
                                               <td>Rs {Number(item.amount || 0).toLocaleString()}</td>
