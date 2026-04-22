@@ -67,6 +67,10 @@ const ChalanManagement = () => {
   };
 
   const toggleBiltySelection = (bilty) => {
+    if (bilty.is_stopped) {
+      alert(`⚠️ Bilty #${bilty.bilty_no} STOP hai — Chalan mein select nahi kar sakte!\n\nPehle "All Bookings" page se is bilty ko Resume karo.`);
+      return;
+    }
     const nextSelected = { ...selectedBilties };
     if (nextSelected[bilty.id]) {
       delete nextSelected[bilty.id];
@@ -293,19 +297,19 @@ const ChalanManagement = () => {
                 {warehouseBilties.map(b => (
                   <tr key={b.id} 
                       onClick={() => toggleBiltySelection(b)}
-                      style={{ cursor: 'pointer', backgroundColor: selectedBilties[b.id] ? 'var(--primary-light)' : 'transparent' }}>
+                      style={{ cursor: 'pointer', backgroundColor: b.is_stopped ? '#fff1f2' : selectedBilties[b.id] ? 'var(--primary-light)' : 'transparent', opacity: b.is_stopped ? 0.8 : 1 }}>
                     <td>
                       <div style={{ 
                         width: '20px', height: '20px', 
                         borderRadius: '4px', 
-                        border: '2px solid var(--primary)',
+                        border: `2px solid ${b.is_stopped ? '#dc2626' : 'var(--primary)'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        backgroundColor: selectedBilties[b.id] ? 'var(--primary)' : 'transparent'
+                        backgroundColor: b.is_stopped ? '#fee2e2' : selectedBilties[b.id] ? 'var(--primary)' : 'transparent'
                       }}>
-                        {selectedBilties[b.id] && <Check size={14} color="white" />}
+                        {b.is_stopped ? <span style={{ fontSize: '10px' }}>🚫</span> : selectedBilties[b.id] && <Check size={14} color="white" />}
                       </div>
                     </td>
-                    <td className="font-bold">#{b.bilty_no}</td>
+                    <td className="font-bold">#{b.bilty_no}{b.is_stopped && <span style={{ marginLeft: '4px', fontSize: '0.65rem', background: '#dc2626', color: 'white', borderRadius: '4px', padding: '1px 5px', fontWeight: 700 }}>STOP</span>}</td>
                     <td>{b.route_from || b.from_city} → {b.route_to || b.to_city}</td>
                     <td>{b.sender_name}</td>
                     <td className="font-bold text-primary">{b.remaining_quantity}</td>

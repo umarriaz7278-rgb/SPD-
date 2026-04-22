@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Search, Package, Truck, Archive, CheckCircle2, 
   ChevronDown, ChevronUp, AlertTriangle, MapPin,
-  FileText, Loader2, Calendar, Filter, Trash2
+  FileText, Loader2, Calendar, Filter, Trash2, Ban, PlayCircle
 } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 15;
@@ -244,6 +244,23 @@ const BiltyHistory = () => {
     }
   };
 
+  const handleStopBilty = async (e, bilty) => {
+    e.stopPropagation();
+    const isStopped = bilty.is_stopped;
+    const action = isStopped ? 'RESUME' : 'STOP';
+    if (!window.confirm(`Bilty #${bilty.bilty_no} ko ${action} karna chahte hain?`)) return;
+    try {
+      const { error } = await supabase
+        .from('bilties')
+        .update({ is_stopped: !isStopped })
+        .eq('id', bilty.id);
+      if (error) throw error;
+      setBilties(prev => prev.map(b => b.id === bilty.id ? { ...b, is_stopped: !isStopped } : b));
+    } catch (err) {
+      alert('Error updating bilty: ' + err.message);
+    }
+  };
+
   const handleWhatsApp = (e, bilty) => {
     e.stopPropagation();
     const msg =
@@ -449,6 +466,13 @@ const BiltyHistory = () => {
                             style={{ background: '#1e40af', border: 'none', borderRadius: '6px', padding: '0.3rem 0.4rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
                           >
                             <FileText size={15} />
+                          </button>
+                          <button
+                            onClick={(e) => handleStopBilty(e, bilty)}
+                            title={bilty.is_stopped ? 'Bilty Resume Karo' : 'Bilty Stop Karo'}
+                            style={{ background: bilty.is_stopped ? '#dcfce7' : '#fff1f2', border: 'none', borderRadius: '6px', padding: '0.3rem 0.4rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: bilty.is_stopped ? '#16a34a' : '#dc2626' }}
+                          >
+                            {bilty.is_stopped ? <PlayCircle size={15} /> : <Ban size={15} />}
                           </button>
                           <button
                             onClick={(e) => handleDeleteBilty(e, bilty)}
