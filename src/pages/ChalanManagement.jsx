@@ -97,7 +97,25 @@ const ChalanManagement = () => {
   const totalProfit = totalChalanAmount - deliveryDeduction - Number(chalanForm.labourCost) - Number(chalanForm.vehicleExpense);
 
   const handlePrint = () => {
-    window.print();
+    const el = document.getElementById('chalan-print-target');
+    if (!el) return;
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    printWindow.document.write(`<!DOCTYPE html><html><head>
+      <title>Chalan #${printChalanData?.chalan_no || ''}</title>
+      <style>
+        @page { size: A4; margin: 8mm 10mm; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: white; color: black; }
+        table { border-collapse: collapse; }
+        img { max-width: 100%; }
+      </style>
+    </head><body>${el.innerHTML}</body></html>`);
+    printWindow.document.close();
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }, 400);
   };
 
   const handleCreateChalan = async (e) => {
