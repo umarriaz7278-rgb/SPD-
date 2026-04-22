@@ -68,7 +68,7 @@ const ChalanManagement = () => {
 
   const toggleBiltySelection = (bilty) => {
     if (bilty.is_stopped) {
-      alert(`⚠️ Bilty #${bilty.bilty_no} STOP hai — Chalan mein select nahi kar sakte!\n\nPehle "All Bookings" page se is bilty ko Resume karo.`);
+      alert(`⚠️ Bilty #${bilty.bilty_no} is STOPPED — Cannot be added to Chalan!\n\nPlease go to "All Bookings" and Resume this bilty first.`);
       return;
     }
     const nextSelected = { ...selectedBilties };
