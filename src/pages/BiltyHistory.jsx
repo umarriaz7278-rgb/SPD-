@@ -261,6 +261,23 @@ const BiltyHistory = () => {
     }
   };
 
+  const handleToggleBillDone = async (e, bilty) => {
+    e.stopPropagation();
+    const current = bilty.bill_done;
+    const action = current ? 'Bill UNMARK' : 'Bill DONE mark';
+    if (!window.confirm(`Bilty #${bilty.bilty_no} ko ${action} karna chahte hain?`)) return;
+    try {
+      const { error } = await supabase
+        .from('bilties')
+        .update({ bill_done: !current })
+        .eq('id', bilty.id);
+      if (error) throw error;
+      setBilties(prev => prev.map(b => b.id === bilty.id ? { ...b, bill_done: !current } : b));
+    } catch (err) {
+      alert('Error updating bilty: ' + err.message);
+    }
+  };
+
   const handleWhatsApp = (e, bilty) => {
     e.stopPropagation();
     const msg =
@@ -468,6 +485,13 @@ const BiltyHistory = () => {
                             style={{ background: '#1e40af', border: 'none', borderRadius: '6px', padding: '0.3rem 0.4rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}
                           >
                             <FileText size={15} />
+                          </button>
+                          <button
+                            onClick={(e) => handleToggleBillDone(e, bilty)}
+                            title={bilty.bill_done ? 'Bill Done - Click to Unmark' : 'Mark Bill Done'}
+                            style={{ background: bilty.bill_done ? '#dcfce7' : '#f3f4f6', border: bilty.bill_done ? '2px solid #16a34a' : '2px solid #d1d5db', borderRadius: '6px', padding: '0.3rem 0.4rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: bilty.bill_done ? '#16a34a' : '#9ca3af' }}
+                          >
+                            <CheckCircle2 size={15} />
                           </button>
                           <button
                             onClick={(e) => handleStopBilty(e, bilty)}
